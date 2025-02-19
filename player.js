@@ -2,13 +2,12 @@ class Player {
   constructor(camera, canvas, scene) {
     this.camera = camera;
     this.scene = scene;
-    this.velocidade = 0.03;
+    this.velocidade = 0.02;
     this.sensibilidadeMouse = 0.001;
     this.movimentos = { frente: false, tras: false, esquerda: false, direita: false };
 
     // Física
-    // this.alturaChao = -4.8; // Posição do chão
-    this.alturaChao = -3.8; // Posição do chão
+    this.alturaChao = mapa.obterAlturaTerreno(this.camera.position.x, this.camera.position.z);
     this.velocidadeY = 0;
     this.gravidade = -0.002;
     this.forcaPulo = 0.03;
@@ -33,7 +32,8 @@ class Player {
       case 'KeyA': this.movimentos.esquerda = true; break;
       case 'KeyD': this.movimentos.direita = true; break;
       case 'Space': 
-        if (this.camera.position.y <= this.alturaChao + 0.01) { 
+        const alturaTerreno = mapa.obterAlturaTerreno(this.camera.position.x, this.camera.position.z);
+        if (this.camera.position.y <= alturaTerreno + 0.01 && this.velocidadeY <= 0) { 
           this.velocidadeY = this.forcaPulo;
         }
         break;
@@ -67,8 +67,7 @@ class Player {
     direcao.normalize();
 
     const direita = new THREE.Vector3().crossVectors(this.camera.up, direcao).normalize();
-
-    const proximaPosicao = this.camera.position.clone(); // Clona a posição atual para teste
+    const proximaPosicao = this.camera.position.clone();
 
     if (this.movimentos.frente) proximaPosicao.addScaledVector(direcao, this.velocidade);
     if (this.movimentos.tras) proximaPosicao.addScaledVector(direcao, -this.velocidade);
@@ -79,10 +78,9 @@ class Player {
     const alturaTerrenoAtual = mapa.obterAlturaTerreno(this.camera.position.x, this.camera.position.z);
     const alturaTerrenoFutura = mapa.obterAlturaTerreno(proximaPosicao.x, proximaPosicao.z);
 
-    const limiteSubida = 0.2; // Define a altura máxima que o jogador pode subir sem pular
+    const limiteSubida = 0.2; // Permite subir desníveis de até 0.3 sem pular
 
     if (alturaTerrenoFutura - alturaTerrenoAtual <= limiteSubida) {
-        // Permite o movimento apenas se a elevação não for muito grande
         this.camera.position.copy(proximaPosicao);
     }
 
@@ -97,7 +95,7 @@ class Player {
         this.velocidadeY = 0;
     }
 
-    // Colisão com as paredes do cubo (limitação no X e Z)
+    // Limites do mapa
     this.camera.position.x = Math.max(this.limiteMin, Math.min(this.limiteMax, this.camera.position.x));
     this.camera.position.z = Math.max(this.limiteMin, Math.min(this.limiteMax, this.camera.position.z));
   }
