@@ -1,5 +1,5 @@
 const mapa = new Mapa();
-const player = new Player(mapa.camera, mapa.renderer.domElement, mapa.scene, mapa);
+const player = new Player(mapa);
 
 function animate() {
   requestAnimationFrame(animate);

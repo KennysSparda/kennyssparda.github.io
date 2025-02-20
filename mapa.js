@@ -11,7 +11,7 @@ class Mapa {
     this.carregarSkyboxEstrelas();
     this.adicionarChao();
     this.adicionarSolELua();
-
+    this.adicionarAgua()
     this.tempo = 0;
     this.faseLua = 0;
   }
@@ -61,75 +61,52 @@ class Mapa {
 
   adicionarSolELua() {
     const geometria = new THREE.SphereGeometry(5, 16, 16);
-
-    const materialSol = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1 });
-    const materialLua = new THREE.MeshStandardMaterial({ color: 0xaaaa00, emissive: 0xccccaa, emissiveIntensity: 0.5 });
-
-    this.sol = new THREE.Mesh(geometria, materialSol);
-    this.lua = new THREE.Mesh(geometria, materialLua);
-
-    this.luzSol = new THREE.DirectionalLight(0xffffff, 3.5);
-    this.luzLua = new THREE.DirectionalLight(0x555555, 1);
-
-    this.luzSol.castShadow = true;
-    this.luzLua.castShadow = true;
-
-    this.scene.add(this.sol, this.lua, this.luzSol, this.luzLua);
+    this.sol = new THREE.Mesh(geometria, new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff }));
+    this.lua = new THREE.Mesh(geometria, new THREE.MeshStandardMaterial({ color: 0xaaaaaa, emissive: 0x888888 }));
+    
+    this.luzSol = new THREE.DirectionalLight(0xffffff, 2);
+    this.luzLua = new THREE.DirectionalLight(0x555555, 0.8);
+    
+    this.luzSol.target = new THREE.Object3D();
+    this.luzLua.target = new THREE.Object3D();
+    this.scene.add(this.luzSol.target, this.luzLua.target);
+    
+    this.luzAmbiente = new THREE.AmbientLight(0xffffff, 0.2);
+    this.scene.add(this.luzAmbiente, this.sol, this.lua, this.luzSol, this.luzLua);
   }
 
   atualizarSolELua() {
-    if (!this.skyboxEstrelas || !this.skyboxCeu) {
-      return;
-    }
-
     this.tempo += 0.01;
     const raio = 100;
-
-   
+    
     const horarioSol = this.tempo * 0.2;
     const horarioLua = this.tempo * 0.2 + Math.PI;
 
-   
     this.sol.position.set(Math.cos(horarioSol) * raio, Math.sin(horarioSol) * raio, 0);
     this.lua.position.set(Math.cos(horarioLua) * raio, Math.sin(horarioLua) * raio, 0);
-
-   
+    
     this.luzSol.position.copy(this.sol.position);
     this.luzLua.position.copy(this.lua.position);
+    
+    this.luzSol.target.position.copy(this.camera.position);
+    this.luzLua.target.position.copy(this.camera.position);
+    this.luzSol.target.updateMatrixWorld();
+    this.luzLua.target.updateMatrixWorld();
 
-   
-    this.faseLua = Math.sin(this.tempo * 0.1) * 0.5 + 0.5;
+    this.luzSol.intensity = Math.max(0.3, Math.sin(horarioSol) * 1.5);
+    this.luzLua.intensity = Math.max(0.3, Math.sin(horarioLua) * 0.8);
 
-   
-    this.lua.material.opacity = this.faseLua;
-    this.lua.material.reflectivity = this.faseLua;
-
-    this.luzSol.intensity = Math.max(0, Math.sin(horarioSol) * 1.5);
-    this.luzLua.intensity = Math.max(0, Math.sin(horarioLua) * 0.5);
-
-   
-    const solAltura = Math.sin(horarioSol);
-
-   
-    if (solAltura > 0) {
-      const alpha = Math.min(solAltura, 1);
-      this.skyboxEstrelas.material.opacity = 1 - alpha;
-      this.skyboxEstrelas.material.transparent = true;
-      this.skyboxCeu.material.opacity = alpha;
-      this.skyboxCeu.material.transparent = false;
-    } else {
-      const alpha = Math.min(-solAltura, 1);
-      this.skyboxEstrelas.material.opacity = alpha;
-      this.skyboxEstrelas.material.transparent = false;
-      this.skyboxCeu.material.opacity = 1 - alpha;
-      this.skyboxCeu.material.transparent = true;
+    if (this.skyboxEstrelas && this.skyboxEstrelas.material && this.skyboxCeu && this.skyboxCeu.material) {
+      const solAltura = Math.sin(horarioSol);
+      this.skyboxEstrelas.material.opacity = solAltura < 0 ? 1 : 1 - solAltura;
+      this.skyboxCeu.material.opacity = solAltura > 0 ? 1 : 1 + solAltura;
     }
   }
 
   adicionarChao() {
     const largura = 10;
     const altura = 10;
-    const segmentos = 50;
+    const segmentos = 200;
     
     const geometriaChao = new THREE.PlaneGeometry(largura, altura, segmentos, segmentos);
     geometriaChao.rotateX(-Math.PI / 2);
@@ -138,12 +115,10 @@ class Mapa {
     const loader = new THREE.TextureLoader();
     this.displacementMap = loader.load('/assets/chaoRuido.png');
   
-   
-    const texturaChao = loader.load('/assets/chao.png');
+    const texturaTerreno = loader.load('/assets/chao.png');
   
-   
-    const materialChao = new THREE.MeshStandardMaterial({
-      map: texturaChao, 
+    const materialTerreno = new THREE.MeshStandardMaterial({
+      map: texturaTerreno, 
       displacementMap: this.displacementMap, 
       displacementScale: 2,
       roughness: 0.8,
@@ -151,20 +126,16 @@ class Mapa {
     });
   
    
-    this.chao = new THREE.Mesh(geometriaChao, materialChao);
-    this.chao.position.set(0, -5, 0);
-    this.chao.name = "chao"; 
-    this.scene.add(this.chao);
+    this.terreno = new THREE.Mesh(geometriaChao, materialTerreno);
+    this.terreno.position.set(0, 0, 0);
+    this.terreno.name = "terreno"; 
+    this.scene.add(this.terreno);
   }
-
 
   obterAlturaTerreno(x, z) {
     if (!this.displacementMap || !this.displacementMap.image) {
-      console.warn("Displacement map não carregado.");
       return 0;
     }
-  
-    console.log("DisplacementMap Image:", this.displacementMap.image);
   
     const image = this.displacementMap.image;
     const canvas = document.createElement("canvas");
@@ -192,10 +163,50 @@ class Mapa {
 
     const intensity = data[index];
 
-    const altura = (intensity / 255) * this.chao.material.displacementScale;
+    const altura = (intensity / 255) * this.terreno.material.displacementScale;
 
-    return altura - 4.5;
+    return altura;
   }
+
+  adicionarAgua() {
+    this.videoAgua = document.createElement("video");
+    this.videoAgua.src = "/assets/agua.mp4"; 
+    this.videoAgua.loop = true;
+    this.videoAgua.muted = true;
+  
+    // Criar textura de vídeo
+    this.texturaAgua = new THREE.VideoTexture(this.videoAgua);
+    this.texturaAgua.minFilter = THREE.LinearFilter;
+    this.texturaAgua.magFilter = THREE.LinearFilter;
+    this.texturaAgua.wrapS = THREE.RepeatWrapping;
+    this.texturaAgua.wrapT = THREE.RepeatWrapping;
+    this.texturaAgua.repeat.set(4, 4);
+  
+    // Criar plano de água
+    const geometriaAgua = new THREE.PlaneGeometry(10, 10);
+    const materialAgua = new THREE.MeshStandardMaterial({
+      map: this.texturaAgua,
+      transparent: true,
+      opacity: 0.8,
+      roughness: 0.4,
+      metalness: 0.6
+    });
+
+    this.agua = new THREE.Mesh(geometriaAgua, materialAgua);
+    this.agua.rotation.x = -Math.PI / 2;
+    this.agua.position.y = 0.1;
+  
+    this.scene.add(this.agua);
+
+    // Só iniciar o vídeo após interação do usuário
+    const iniciarVideo = () => {
+        this.videoAgua.play().catch(e => console.warn("Falha ao iniciar vídeo:", e));
+        document.removeEventListener("click", iniciarVideo);
+    };
+    document.addEventListener("click", iniciarVideo);
+  }
+
+  
   
   render() {
     this.atualizarSolELua();
