@@ -5,7 +5,9 @@ function animate() {
   requestAnimationFrame(animate);
   
   player.update();
-  mapa.render();
+  
+  mapa.render(player);
+
 }
 
 animate();

@@ -1,12 +1,13 @@
 class Mapa {
   constructor() {
+    this.viewDistanceMin = 0.1
+    this.viewDistanceMax = 1000
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, this.viewDistanceMin, this.viewDistanceMax);
 
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
-
 
     this.carregarSkyboxEstrelas();
     this.adicionarChao();
@@ -15,7 +16,6 @@ class Mapa {
     this.tempo = 0;
     this.faseLua = 0;
   }
-
 
   carregarSkyboxEstrelas() {
     const loader = new THREE.TextureLoader();
@@ -49,7 +49,6 @@ class Mapa {
         transparent: true,
         opacity: 1
       });
-
      
       this.skyboxEstrelas = new THREE.Mesh(geometria, this.materialEstrelas);
       this.skyboxCeu = new THREE.Mesh(geometria, this.materialCeu);
@@ -100,39 +99,53 @@ class Mapa {
       const solAltura = Math.sin(horarioSol);
       this.skyboxEstrelas.material.opacity = solAltura < 0 ? 1 : 1 - solAltura;
       this.skyboxCeu.material.opacity = solAltura > 0 ? 1 : 1 + solAltura;
+      // Cria a criatura apenas uma vez quando anoitece
+      if (solAltura < 0 && !this.criatura) {
+        this.criatura = new Criatura(this.scene);
+      }
+      // Remove a criatura ao amanhecer
+      if (solAltura > 0 && this.criatura) {
+        this.scene.remove(this.criatura.mesh); // Remove da cena
+        this.criatura = null; // Reseta a variável para poder recriar depois
+      }
     }
   }
 
   adicionarChao() {
-    const largura = 10;
-    const altura = 10;
-    const segmentos = 200;
+    const largura = 100;
+    const altura = 100;
+    const segmentos = 1000;
     
     const geometriaChao = new THREE.PlaneGeometry(largura, altura, segmentos, segmentos);
     geometriaChao.rotateX(-Math.PI / 2);
-  
-   
-    const loader = new THREE.TextureLoader();
-    this.displacementMap = loader.load('/assets/chaoRuido.png');
-  
-    const texturaTerreno = loader.load('/assets/chao.png');
-  
-    const materialTerreno = new THREE.MeshStandardMaterial({
-      map: texturaTerreno, 
-      displacementMap: this.displacementMap, 
-      displacementScale: 2,
-      roughness: 0.8,
-      metalness: 0.2,
-    });
-  
-   
-    this.terreno = new THREE.Mesh(geometriaChao, materialTerreno);
-    this.terreno.position.set(0, 0, 0);
-    this.terreno.name = "terreno"; 
-    this.scene.add(this.terreno);
-  }
 
-  obterAlturaTerreno(x, z) {
+    const loader = new THREE.TextureLoader();
+
+    loader.load('/assets/terrenoTopografia.png', (textura) => {
+        this.displacementMap = textura;
+        
+        loader.load('/assets/terreno.png', (texturaTerreno) => {
+            const materialTerreno = new THREE.MeshStandardMaterial({
+                map: texturaTerreno, 
+                displacementMap: this.displacementMap, 
+                displacementScale: 2,
+                roughness: 0.8,
+                metalness: 0.2,
+            });
+
+            this.terreno = new THREE.Mesh(geometriaChao, materialTerreno);
+            this.terreno.position.set(0, 0, 0);
+            this.terreno.name = "terreno"; 
+            this.scene.add(this.terreno);
+
+            // Agora que a textura carregou, processa o mapa
+            this.alturas = this.processarMapa();
+        });
+    });
+}
+
+
+  processarMapa() {
     if (!this.displacementMap || !this.displacementMap.image) {
       return 0;
     }
@@ -148,20 +161,27 @@ class Mapa {
     const width = canvas.width;
     const height = canvas.height;
   
-    const u = (x / 10 + 0.5) * width;
-    const v = (z / 10 + 0.5) * height;
+    const imageData = ctx.getImageData(0, 0, width, height);
+    return imageData.data;
+  }
+
+  obterAlturaTerreno(x, z) {
+    if (!this.alturas) {
+      return 0;
+    }
+
+    const width = this.displacementMap.image.width;
+    const height = this.displacementMap.image.height;
+
+    const u = (x / 100 + 0.5) * width;
+    const v = (z / 100 + 0.5) * height;
   
     const uClamped = Math.floor(Math.max(0, Math.min(width - 1, u)));
     const vClamped = Math.floor(Math.max(0, Math.min(height - 1, v)));
-  
-   
-    const imageData = ctx.getImageData(0, 0, width, height);
-    const data = imageData.data;
-  
    
     const index = (vClamped * width + uClamped) * 4;
 
-    const intensity = data[index];
+    const intensity = this.alturas[index];
 
     const altura = (intensity / 255) * this.terreno.material.displacementScale;
 
@@ -180,10 +200,10 @@ class Mapa {
     this.texturaAgua.magFilter = THREE.LinearFilter;
     this.texturaAgua.wrapS = THREE.RepeatWrapping;
     this.texturaAgua.wrapT = THREE.RepeatWrapping;
-    this.texturaAgua.repeat.set(4, 4);
+    this.texturaAgua.repeat.set(20, 20);
   
     // Criar plano de água
-    const geometriaAgua = new THREE.PlaneGeometry(10, 10);
+    const geometriaAgua = new THREE.PlaneGeometry(100, 100);
     const materialAgua = new THREE.MeshStandardMaterial({
       map: this.texturaAgua,
       transparent: true,
@@ -194,7 +214,7 @@ class Mapa {
 
     this.agua = new THREE.Mesh(geometriaAgua, materialAgua);
     this.agua.rotation.x = -Math.PI / 2;
-    this.agua.position.y = 0.1;
+    this.agua.position.y = 0.5;
   
     this.scene.add(this.agua);
 
@@ -206,10 +226,11 @@ class Mapa {
     document.addEventListener("click", iniciarVideo);
   }
 
-  
-  
-  render() {
+  render(player) {
     this.atualizarSolELua();
+    if (this.criatura) {
+      this.criatura.seguir(player);
+    }
     this.renderer.render(this.scene, this.camera);
   }
 }

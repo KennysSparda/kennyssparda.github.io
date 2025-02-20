@@ -2,23 +2,25 @@ class Player {
   constructor(mapa) {
     this.camera = mapa.camera;
     this.scene = mapa.scene;
-    this.velocidade = 0.05;
     this.sensibilidadeMouse = 0.001;
-    this.movimentos = { frente: false, tras: false, esquerda: false, direita: false };
-
+    this.movimentos = { frente: false, tras: false, esquerda: false, direita: false, pulando: false, correndo: false};
+    
     // Física
+    this.velocidadeInicial = 0.01
+    this.velocidadeAtual = this.velocidadeInicial
+    this.velocidadeCorrida = 0.03
+
     this.velocidadeY = 0;
     this.gravidade = -0.002;
-    this.forcaPulo = 1.03;
-
+    this.forcaPulo = 0.02;
+    this.stamina = 5
     this.alturaJogador = 0.4
 
     this.playerPositionX = 0
     this.playerPositionZ = 0
     this.playerPositionY = mapa.obterAlturaTerreno(this.playerPositionX, this.playerPositionZ) + this.alturaJogador
 
-    this.limiteSubida = 0.2; // Define a altura máxima que o jogador pode subir sem pular
-    this.pulando = false
+    this.limiteSubida = 0.1; // Define a altura máxima que o jogador pode subir sem pular
 
     // Definir limites do cubo (skybox)
     this.limiteMin = -4.8; // Para evitar ficar colado na borda
@@ -39,11 +41,12 @@ class Player {
       case 'KeyS': this.movimentos.tras = true; break;
       case 'KeyA': this.movimentos.esquerda = true; break;
       case 'KeyD': this.movimentos.direita = true; break;
+      case 'ControlLeft': this.movimentos.correndo = true; break;
       case 'Space': 
-        // if (!this.pulando) { 
+         if (!this.movimentos.pulando) { 
           this.velocidadeY = this.forcaPulo;
-          this.pulando = true;
-        //}
+          this.movimentos.pulando = true;
+        }
         break;
     }
   }
@@ -53,7 +56,8 @@ class Player {
       case 'KeyW': this.movimentos.frente = false; break;
       case 'KeyS': this.movimentos.tras = false; break;
       case 'KeyA': this.movimentos.esquerda = false; break;
-      case 'KeyD': this.movimentos.direita = false; break;
+      case 'KeyF': this.movimentos.direita = false; break;
+      case 'ControlLeft': this.movimentos.correndo = false; break;
     }
   }
 
@@ -76,22 +80,35 @@ class Player {
 
     const direita = new THREE.Vector3().crossVectors(this.camera.up, direcao).normalize();
 
+    // Gerenciamento da stamina
+    if (this.movimentos.correndo && this.stamina > 0) {
+      this.velocidadeAtual = this.velocidadeCorrida;
+      this.stamina -= 0.02; // Gasta stamina ao correr
+    } else {
+      this.velocidadeAtual = this.velocidadeInicial;
+      if (this.stamina < 5) {
+        this.stamina += 0.01; // Recupera stamina quando não está correndo
+      }
+    }
+
+    // Evita valores negativos na stamina
+    this.stamina = Math.max(0, Math.min(5, this.stamina));
+
     const proximaPosicao = this.camera.position.clone(); // Clona a posição atual para teste
-    if (this.movimentos.frente) proximaPosicao.addScaledVector(direcao, this.velocidade);
-    if (this.movimentos.tras) proximaPosicao.addScaledVector(direcao, -this.velocidade);
-    if (this.movimentos.esquerda) proximaPosicao.addScaledVector(direita, this.velocidade);
-    if (this.movimentos.direita) proximaPosicao.addScaledVector(direita, -this.velocidade);
+    if (this.movimentos.frente) proximaPosicao.addScaledVector(direcao, this.velocidadeAtual);
+    if (this.movimentos.tras) proximaPosicao.addScaledVector(direcao, -this.velocidadeAtual);
+    if (this.movimentos.esquerda) proximaPosicao.addScaledVector(direita, this.velocidadeAtual);
+    if (this.movimentos.direita) proximaPosicao.addScaledVector(direita, -this.velocidadeAtual);
 
     // Verifica a altura do terreno na posição futura
     const alturaTerrenoAtual = mapa.obterAlturaTerreno(this.playerPositionX, this.playerPositionZ);
     const alturaTerrenoFutura = mapa.obterAlturaTerreno(proximaPosicao.x, proximaPosicao.z);
-    const diferencaSubida = alturaTerrenoFutura - alturaTerrenoAtual
+    const diferencaSubida = alturaTerrenoFutura - alturaTerrenoAtual;
 
-    if (diferencaSubida <= this.limiteSubida || this.pulando && diferencaSubida <= this.playerPositionY) {
-        // Permite o movimento apenas se a elevação não for muito grande ou se o jogador estiver acima da diferença de subida
-        this.playerPositionX = proximaPosicao.x
-        this.playerPositionY = proximaPosicao.y
-        this.playerPositionZ = proximaPosicao.z
+    if (diferencaSubida <= this.limiteSubida || (this.movimentos.pulando && diferencaSubida <= this.playerPositionY)) {
+        this.playerPositionX = proximaPosicao.x;
+        this.playerPositionY = proximaPosicao.y;
+        this.playerPositionZ = proximaPosicao.z;
 
         this.camera.position.set(proximaPosicao.x , proximaPosicao.y , proximaPosicao.z );
     }
@@ -105,7 +122,7 @@ class Player {
     if (this.playerPositionY <= alturaTerreno + this.alturaJogador) {
         this.playerPositionY = alturaTerreno + this.alturaJogador;
         this.velocidadeY = 0;
-        this.pulando = false;
+        this.movimentos.pulando = false;
     }
 
     // Colisão com as paredes do cubo (limitação no X e Z)
