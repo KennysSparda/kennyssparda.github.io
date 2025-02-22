@@ -4,7 +4,7 @@ const player = new Player(mapa);
 function animate() {
   requestAnimationFrame(animate);
   
-  player.update();
+  player.update(mapa);
   
   mapa.render(player);
 

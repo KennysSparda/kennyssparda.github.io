@@ -16,7 +16,7 @@ class Criatura {
 
       this.mesh = new THREE.Mesh(geometry, materiais);
       this.mesh.position.set(0, 1, -5); // Posição inicial
-      this.velocidade = 0.01
+      this.velocidade = 0.6
 
       scene.add(this.mesh);
     });

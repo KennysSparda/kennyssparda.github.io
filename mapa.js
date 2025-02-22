@@ -1,20 +1,32 @@
 class Mapa {
   constructor() {
     this.viewDistanceMin = 0.1
-    this.viewDistanceMax = 1000
+    this.viewDistanceMax = 5000
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, this.viewDistanceMin, this.viewDistanceMax);
+
+    this.tamanho = 100
+    this.tamanhoX = this.tamanho
+    this.tamanhoZ = this.tamanho
+
+    this.nivelDetalhes = 512
+    this.alturaEscala = 2
+    this.alturaDaAgua = 0.5
 
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
 
     this.carregarSkyboxEstrelas();
-    this.adicionarChao();
-    this.adicionarSolELua();
-    this.adicionarAgua()
+    this.adicionarChao(this.tamanhoX, this.tamanhoZ, this.nivelDetalhes, this.alturaEscala);
+    this.adicionarSol()
+    this.adicionarLua();
+    this.adicionarAgua(this.tamanhoX, this.tamanhoZ)
     this.tempo = 0;
     this.faseLua = 0;
+
+    this.luzAmbiente = new THREE.AmbientLight(0x404040, 0.5); // Luz ambiente suave
+    this.scene.add(this.luzAmbiente);
   }
 
   carregarSkyboxEstrelas() {
@@ -36,7 +48,7 @@ class Mapa {
   checkTexturesLoaded() {
     if (this.texturaEstrelas && this.texturaCeu) {
      
-      const geometria = new THREE.BoxGeometry(300, 300, 300);
+      const geometria = new THREE.BoxGeometry(this.tamanho * 5, this.tamanho * 5, this.tamanho * 5);
       this.materialEstrelas = new THREE.MeshBasicMaterial({
         map: this.texturaEstrelas,
         side: THREE.BackSide,
@@ -58,65 +70,118 @@ class Mapa {
     }
   }
 
-  adicionarSolELua() {
-    const geometria = new THREE.SphereGeometry(5, 16, 16);
+  adicionarSol() {
+    const geometria = new THREE.SphereGeometry(50, 16, 16);
     this.sol = new THREE.Mesh(geometria, new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff }));
-    this.lua = new THREE.Mesh(geometria, new THREE.MeshStandardMaterial({ color: 0xaaaaaa, emissive: 0x888888 }));
     
     this.luzSol = new THREE.DirectionalLight(0xffffff, 2);
-    this.luzLua = new THREE.DirectionalLight(0x555555, 0.8);
-    
     this.luzSol.target = new THREE.Object3D();
-    this.luzLua.target = new THREE.Object3D();
-    this.scene.add(this.luzSol.target, this.luzLua.target);
     
-    this.luzAmbiente = new THREE.AmbientLight(0xffffff, 0.2);
-    this.scene.add(this.luzAmbiente, this.sol, this.lua, this.luzSol, this.luzLua);
+    this.scene.add(this.luzSol.target, this.sol, this.luzSol);
   }
 
-  atualizarSolELua() {
-    this.tempo += 0.01;
-    const raio = 100;
-    
-    const horarioSol = this.tempo * 0.2;
-    const horarioLua = this.tempo * 0.2 + Math.PI;
+  adicionarLua() {
+    const texturaLoader = new THREE.TextureLoader();
+    const texturaLua = texturaLoader.load('/assets/lua.jpg');
+    const normalMapLua = texturaLoader.load('/assets/luaTopografia.jpg');
 
-    this.sol.position.set(Math.cos(horarioSol) * raio, Math.sin(horarioSol) * raio, 0);
-    this.lua.position.set(Math.cos(horarioLua) * raio, Math.sin(horarioLua) * raio, 0);
+    // Criação do material da Lua
+    this.materialLua = new THREE.MeshPhongMaterial({
+      map: texturaLua,
+      normalMap: normalMapLua,
+      shininess: 25, // Controla o brilho; valores mais baixos reduzem o aspecto metálico
+      specular: new THREE.Color(0xffffff), // Cor da luz especular; tons mais escuros reduzem o brilho
+      color: new THREE.Color(0xffffff) // Cor base da Lua
+    });
     
+    const geometriaLua = new THREE.SphereGeometry(10, 256, 256);
+    this.lua = new THREE.Mesh(geometriaLua, this.materialLua);
+    
+    this.luzLua = new THREE.DirectionalLight(0x555555, 0.8);
+    this.luzLua.target = new THREE.Object3D();
+    
+    this.scene.add(this.luzLua.target, this.lua, this.luzLua);
+  }
+
+  atualizarSol() {
+    this.tempo += 0.01;
+    const raio = this.tamanho * 2.5;
+    this.horarioSol = this.tempo * 0.2;
+
+    this.sol.position.set(Math.cos(this.horarioSol) * raio, Math.sin(this.horarioSol) * raio, 0);
     this.luzSol.position.copy(this.sol.position);
-    this.luzLua.position.copy(this.lua.position);
     
     this.luzSol.target.position.copy(this.camera.position);
-    this.luzLua.target.position.copy(this.camera.position);
     this.luzSol.target.updateMatrixWorld();
+    
+    this.luzSol.intensity = Math.max(0.3, Math.sin(this.horarioSol) * 1.5);
+  }
+
+  atualizarLua() {
+    const raio = this.tamanho * 2.5;
+    const horarioLua = this.tempo * 0.2 + Math.PI;
+
+    this.lua.position.set(Math.cos(horarioLua) * raio, Math.sin(horarioLua) * raio, 0);
+    this.luzLua.position.copy(this.lua.position);
+    
+    this.luzLua.target.position.copy(this.lua.position);
     this.luzLua.target.updateMatrixWorld();
-
-    this.luzSol.intensity = Math.max(0.3, Math.sin(horarioSol) * 1.5);
+    
     this.luzLua.intensity = Math.max(0.3, Math.sin(horarioLua) * 0.8);
+    this.atualizarFasesDaLua()
+  }
 
-    if (this.skyboxEstrelas && this.skyboxEstrelas.material && this.skyboxCeu && this.skyboxCeu.material) {
-      const solAltura = Math.sin(horarioSol);
-      this.skyboxEstrelas.material.opacity = solAltura < 0 ? 1 : 1 - solAltura;
-      this.skyboxCeu.material.opacity = solAltura > 0 ? 1 : 1 + solAltura;
-      // Cria a criatura apenas uma vez quando anoitece
+  atualizarFasesDaLua() {
+    // Atualiza a posição da Lua em sua órbita
+    const raioOrbita = this.tamanho * 2.5; // Raio da órbita da Lua
+    const velocidadeOrbital = 0.0001; // Velocidade de órbita
+    const anguloOrbital = performance.now() * velocidadeOrbital;
+  
+    this.lua.position.set(
+      raioOrbita * Math.cos(anguloOrbital),
+      -raioOrbita * Math.cos(anguloOrbital),
+      raioOrbita * Math.sin(anguloOrbital)
+    );
+  
+    // Calcula o ângulo entre a posição da Lua e a direção da luz
+    const vetorLua = new THREE.Vector3().copy(this.lua.position).normalize();
+    const vetorLuz = new THREE.Vector3().copy(this.luzSol.position).normalize();
+    const angulo = vetorLua.dot(vetorLuz);
+  
+    // Ajusta a intensidade da luz refletida pela Lua
+    this.materialLua.emissiveIntensity = Math.max(0.1, angulo);
+  }
+
+  atualizarCeoEstrelas() {
+    if (!this.skyboxEstrelas || !this.skyboxCeu || !this.skyboxEstrelas.material || !this.skyboxCeu.material) return;
+
+    const solAltura = Math.sin(this.horarioSol);
+    
+    // Opacidade do céu e das estrelas
+    this.skyboxEstrelas.material.opacity = solAltura < 0 ? 1 : 1 - solAltura;
+    this.skyboxCeu.material.opacity = solAltura > 0 ? 1 : 1 + solAltura;
+
+
+  }
+
+  gerenciarCriatura() {
+    const solAltura = Math.sin(this.horarioSol);
+      // Criar criatura à noite
       if (solAltura < 0 && !this.criatura) {
         this.criatura = new Criatura(this.scene);
       }
-      // Remove a criatura ao amanhecer
+      // Remover criatura ao amanhecer
       if (solAltura > 0 && this.criatura) {
-        this.scene.remove(this.criatura.mesh); // Remove da cena
-        this.criatura = null; // Reseta a variável para poder recriar depois
+        this.scene.remove(this.criatura.mesh);
+        this.criatura = null;
       }
-    }
   }
 
-  adicionarChao() {
-    const largura = 100;
-    const altura = 100;
-    const segmentos = 1000;
+
+  adicionarChao(tamanhoX, tamanhoZ, nivelDetalhes, alturaEscala) {
+    const segmentos = nivelDetalhes;
     
-    const geometriaChao = new THREE.PlaneGeometry(largura, altura, segmentos, segmentos);
+    const geometriaChao = new THREE.PlaneGeometry(tamanhoX, tamanhoZ, segmentos, segmentos);
     geometriaChao.rotateX(-Math.PI / 2);
 
     const loader = new THREE.TextureLoader();
@@ -128,7 +193,7 @@ class Mapa {
             const materialTerreno = new THREE.MeshStandardMaterial({
                 map: texturaTerreno, 
                 displacementMap: this.displacementMap, 
-                displacementScale: 2,
+                displacementScale: alturaEscala,
                 roughness: 0.8,
                 metalness: 0.2,
             });
@@ -173,8 +238,8 @@ class Mapa {
     const width = this.displacementMap.image.width;
     const height = this.displacementMap.image.height;
 
-    const u = (x / 100 + 0.5) * width;
-    const v = (z / 100 + 0.5) * height;
+    const u = (x / this.tamanhoX + 0.5) * width;
+    const v = (z / this.tamanhoZ + 0.5) * height;
   
     const uClamped = Math.floor(Math.max(0, Math.min(width - 1, u)));
     const vClamped = Math.floor(Math.max(0, Math.min(height - 1, v)));
@@ -188,7 +253,7 @@ class Mapa {
     return altura;
   }
 
-  adicionarAgua() {
+  adicionarAgua(tamanhoX, tamanhoZ) {
     this.videoAgua = document.createElement("video");
     this.videoAgua.src = "/assets/agua.mp4"; 
     this.videoAgua.loop = true;
@@ -200,10 +265,10 @@ class Mapa {
     this.texturaAgua.magFilter = THREE.LinearFilter;
     this.texturaAgua.wrapS = THREE.RepeatWrapping;
     this.texturaAgua.wrapT = THREE.RepeatWrapping;
-    this.texturaAgua.repeat.set(20, 20);
+    this.texturaAgua.repeat.set(this.tamanho / 2, this.tamanho / 2);
   
     // Criar plano de água
-    const geometriaAgua = new THREE.PlaneGeometry(100, 100);
+    const geometriaAgua = new THREE.PlaneGeometry(tamanhoX, tamanhoZ);
     const materialAgua = new THREE.MeshStandardMaterial({
       map: this.texturaAgua,
       transparent: true,
@@ -214,7 +279,7 @@ class Mapa {
 
     this.agua = new THREE.Mesh(geometriaAgua, materialAgua);
     this.agua.rotation.x = -Math.PI / 2;
-    this.agua.position.y = 0.5;
+    this.agua.position.y = this.alturaDaAgua;
   
     this.scene.add(this.agua);
 
@@ -227,9 +292,12 @@ class Mapa {
   }
 
   render(player) {
-    this.atualizarSolELua();
+    this.atualizarSol()
+    this.atualizarLua()
+    this.atualizarCeoEstrelas()
+    this.gerenciarCriatura()
     if (this.criatura) {
-      this.criatura.seguir(player);
+      this.criatura.seguir(player)
     }
     this.renderer.render(this.scene, this.camera);
   }
