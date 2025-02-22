@@ -9,13 +9,15 @@ const player = new Player(mapa, mapa.terreno)
 
 function animate() {
   requestAnimationFrame(animate)
-  const deltaTime = clock.getDelta()
-
+  
   player.update()
   
   mapa.render(player)
+  
+  const deltaTime = clock.getDelta()
   if (mapa.criaturas.passaros) mapa.criaturas.passaros.update(deltaTime)
   if (mapa.criaturas.monstros) mapa.criaturas.monstros.update(deltaTime)
+  if (mapa.criaturas.peixes) mapa.criaturas.peixes.update(deltaTime)
 }
 
 animate()

@@ -8,4 +8,5 @@ const assets = {
   luaTopografia: '/assets/mapa/lua/luaTopografia.jpg',
   passaros: '/assets/criaturas/passaros/scene.gltf',
   monstros: '/assets/criaturas/monstros/scene.gltf',
+  peixe01: '/assets/criaturas/peixes/peixe01/scene.gltf',
 }

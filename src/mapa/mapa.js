@@ -101,8 +101,8 @@ export default class Mapa {
     this.atualizarCeoEstrelas()
     this.criaturas.gerenciarCriaturas(this.horarioSol)
 
-    if (this.monstros) {
-      this.monstros.seguir(player)
+    if (this.criaturas.monstros) {
+      this.criaturas.monstros.seguir(player)
     }
     this.renderer.render(this.scene, this.camera)
   }

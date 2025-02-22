@@ -1,48 +1,64 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
-export default class Monstros {
-  constructor(mapa) {
+export default class meshs {
+  constructor(mapa, quantidade = 5) {
     this.mapa = mapa
     this.scene = mapa.scene
-    this.mesh = null
-    this.mixer = null
+    this.meshes = []
+    this.mixer = []
     this.velocidade = 0.05
+    this.quantidade = quantidade
 
     const loader = new GLTFLoader()
-    loader.load(assets.monstros, (gltf) => {
-      this.mesh = gltf.scene
 
-      this.mesh.scale.set(0.5, 0.5, 0.5)
-      this.mesh.position.set(0, 0, -5) 
+    for (let i = 0; i < this.quantidade; i++) {
+      loader.load(assets.monstros, (gltf) => {
+        const mesh = gltf.scene
 
-      this.scene.add(this.mesh)
+        mesh.scale.set(0.5, 0.5, 0.5)
 
-      if (gltf.animations.length > 0) {
-        this.mixer = new THREE.AnimationMixer(this.mesh)
-        const action = this.mixer.clipAction(gltf.animations[0])
-        action.play()
-      }
-    })
+        // Posiciona aleatoriamente no mapa
+        const raioMapa = mapa.tamanho / 2
+        mesh.position.set(
+          (Math.random() - 0.5) * raioMapa * 2,
+          0,
+          (Math.random() - 0.5) * raioMapa * 2
+        )
+
+        // Ajusta a altura conforme o terreno
+        mesh.position.y = this.mapa.terreno.obterAlturaTerreno(mesh.position.x, mesh.position.z)
+
+        this.scene.add(mesh)
+        this.meshes.push(mesh)
+
+        if (gltf.animations.length > 0) {
+          const mixer = new THREE.AnimationMixer(mesh)
+          const action = mixer.clipAction(gltf.animations[0])
+          action.play()
+          this.mixer.push(mixer)
+        }
+      })
+    }
   }
 
   seguir(player) {
-    if (!this.mesh) return
+    this.meshes.forEach((mesh) => {
+      const posicaoPlayer = new THREE.Vector3(player.playerPositionX, player.playerPositionY, player.playerPositionZ)
+      const direcao = new THREE.Vector3()
+      direcao.subVectors(posicaoPlayer, mesh.position).normalize()
 
-    const posicaoPlayer = new THREE.Vector3(player.playerPositionX, player.playerPositionY, player.playerPositionZ)
-    const direcao = new THREE.Vector3()
-    direcao.subVectors(posicaoPlayer, this.mesh.position).normalize()
+      const angulo = Math.atan2(direcao.x, direcao.z)
+      mesh.rotation.y = angulo
 
-    const angulo = Math.atan2(direcao.x, direcao.z)
-    this.mesh.rotation.y = angulo
+      mesh.position.add(direcao.multiplyScalar(this.velocidade))
 
-    this.mesh.position.add(direcao.multiplyScalar(this.velocidade))
-
-    const alturaChao = this.mapa.obterAlturaTerreno(this.mesh.position.x, this.mesh.position.z)
-    this.mesh.position.y = alturaChao
+      // Ajustar altura para seguir o terreno
+      mesh.position.y = this.mapa.terreno.obterAlturaTerreno(mesh.position.x, mesh.position.z)
+    })
   }
 
   update(deltaTime) {
-    if (this.mixer) this.mixer.update(deltaTime)
+    this.mixer.forEach((mixer) => mixer.update(deltaTime))
   }
 }
