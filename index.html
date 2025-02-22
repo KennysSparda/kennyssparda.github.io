@@ -7,15 +7,24 @@
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
+    #hud { position: absolute;}
+    #staminaElement { background: #00000000;}
   </style>
 </head>
 <body>
-  <script src="lib/three.min.js"></script>
-   
-  <script src="mapa.js"></script>
-  <script src="player.js"></script>
-  <script src="criatura.js"></script>
-  <script src="main.js"></script>
+  <div id="hud">
+    <div id="staminaElement">
+      <label for="stamina">Energia</label>
+      <progress id="stamina" max="5" value="0"></progress>
+    </div>
+  </div>
+
+  <script type="importmap">{"imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.149.0/examples/jsm/"}}</script>
+
+  <script src="./src/etc/assets.js"></script>
+  <script type="module" src="main.js"></script>
   
 </body>
 </html>
