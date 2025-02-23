@@ -14,15 +14,20 @@ sounds.playPassaros()
 
 function animate() {
   requestAnimationFrame(animate)
-  
-  jogador.update()
-  
-  mapa.render(jogador)
-  
-  const deltaTime = clock.getDelta()
-  if (mapa.entidades.passaros) mapa.entidades.passaros.update(deltaTime)
-  if (mapa.entidades.monstros) mapa.entidades.monstros.update(deltaTime)
-  if (mapa.entidades.peixes) mapa.entidades.peixes.update(deltaTime)
+  if (mapa.terreno.terreno) {
+    
+    jogador.update()
+    
+    mapa.render(jogador)
+    
+    const deltaTime = clock.getDelta()
+    if (mapa.entidades.passaros) mapa.entidades.passaros.update(deltaTime)
+    if (mapa.entidades.monstros) mapa.entidades.monstros.update(deltaTime)
+    if (mapa.entidades.peixes) mapa.entidades.peixes.update(deltaTime)
+    
+  } else {
+    console.warn('Aguardando terreno.mesh estar disponível...');
+  }
 }
 
 animate()

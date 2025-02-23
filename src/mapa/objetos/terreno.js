@@ -1,13 +1,13 @@
 import * as THREE from 'three'
 
-export default class Agua {
+export default class Terreno {
   constructor(scene, tamanhoX, tamanhoZ, nivelDetalhes = 100, alturaEscala) {
     this.scene = scene
     this.tamanhoX = tamanhoX
     this.tamanhoZ = tamanhoZ
     this.nivelDetalhes = nivelDetalhes
     this.alturaEscala = alturaEscala
-
+    this.alturas = null
     this.adicionarTerreno()
   }
 
@@ -32,6 +32,7 @@ export default class Agua {
             })
   
             this.terreno = new THREE.Mesh(geometriaChao, materialTerreno)
+            
             this.terreno.position.set(0, 0, 0)
             this.terreno.name = "terreno" 
             this.scene.add(this.terreno)

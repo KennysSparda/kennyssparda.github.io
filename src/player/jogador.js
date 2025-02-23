@@ -13,7 +13,7 @@ export default class jogador {
     this.velocidadeY = 0
     this.gravidade = -0.002
     this.suavizacaoAgachamento = 0.05
-    this.alturaAgachado = 0.4
+    this.alturaAgachado = 0.2
     
     this.alturaJogador = 0.5
     
@@ -21,7 +21,7 @@ export default class jogador {
     this.jogadorPositionZ = 0
     this.jogadorPositionY = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ) + this.alturaJogador
     
-    this.limiteSubida = 0.2
+    this.limiteSubida = 5
     
     this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     
@@ -117,36 +117,52 @@ export default class jogador {
     } else {
       this.velocidadeAtual = this.velocidadeInicial
       if (this.energia < this.energiaMax) {
-        this.energia += 0.01 
+        this.energia += 0.005 
       }
     }
   }
 
   atualizarPosition() {
-    const direcao = new THREE.Vector3()
-    this.camera.getWorldDirection(direcao)
-    direcao.y = 0
-    direcao.normalize()
-
-    const direita = new THREE.Vector3().crossVectors(this.camera.up, direcao).normalize()
-
-    const proximaPosicao = this.camera.position.clone() 
-    if (this.movimentos.frente) proximaPosicao.addScaledVector(direcao, this.velocidadeAtual)
-    if (this.movimentos.tras) proximaPosicao.addScaledVector(direcao, -this.velocidadeAtual)
-    if (this.movimentos.esquerda) proximaPosicao.addScaledVector(direita, this.velocidadeAtual)
-    if (this.movimentos.direita) proximaPosicao.addScaledVector(direita, -this.velocidadeAtual)
+    // Calcula a direção de movimento horizontal
+    const direcao = new THREE.Vector3();
+    this.camera.getWorldDirection(direcao);
+    direcao.y = 0;
+    direcao.normalize();
   
-    const alturaTerrenoAtual = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ)
-    const alturaTerrenoFutura = this.terreno.obterAlturaTerreno(proximaPosicao.x, proximaPosicao.z)
-    const diferencaSubida = alturaTerrenoFutura - alturaTerrenoAtual
+    const direita = new THREE.Vector3().crossVectors(this.camera.up, direcao).normalize();
   
-    if (diferencaSubida <= this.limiteSubida || (this.movimentos.pulando && diferencaSubida <= this.jogadorPositionY)) {
-      this.jogadorPositionX = proximaPosicao.x
-      
-      this.jogadorPositionZ = proximaPosicao.z
+    // Calcula a próxima posição com base no input
+    const proximaPosicao = this.camera.position.clone();
+    if (this.movimentos.frente) proximaPosicao.addScaledVector(direcao, this.velocidadeAtual);
+    if (this.movimentos.tras) proximaPosicao.addScaledVector(direcao, -this.velocidadeAtual);
+    if (this.movimentos.esquerda) proximaPosicao.addScaledVector(direita, this.velocidadeAtual);
+    if (this.movimentos.direita) proximaPosicao.addScaledVector(direita, -this.velocidadeAtual);
+  
+    // Usa Raycaster pra detectar a altura do terreno abaixo da nova posição
+    const rayOrigin = new THREE.Vector3(proximaPosicao.x, proximaPosicao.y + 10, proximaPosicao.z); // 10 unidades acima
+    const rayDirection = new THREE.Vector3(0, -1, 0); // apontando pra baixo
+    const raycaster = new THREE.Raycaster(rayOrigin, rayDirection);
+  
+    // Supondo que o terreno esteja armazenado em this.terreno.mesh
+    const intersects = raycaster.intersectObject(this.terreno.terreno);
+    if (intersects.length > 0) {
+      const groundHeight = intersects[0].point.y;
+      const alturaAtual = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ);
+      const diferencaAltura = Math.abs(groundHeight - alturaAtual);
+  
+      // Se a subida/descida for suave, atualiza a posição
+      if (diferencaAltura <= this.limiteSubida || this.movimentos.pulando) {
+        this.jogadorPositionX = proximaPosicao.x;
+        this.jogadorPositionZ = proximaPosicao.z;
+        // Se não estiver pulando, ajusta a posição vertical para ficar na altura correta
+        if (!this.movimentos.pulando) {
+          this.jogadorPositionY = groundHeight + this.alturaJogador;
+        }
+      }
     }
   }
-
+  
+  
   movimentoAgachar() {
     if(this.movimentos.agachando) {
       this.jogadorPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY - this.alturaAgachado, this.suavizacaoAgachamento)
@@ -170,10 +186,11 @@ export default class jogador {
     this.movimentoAgachar()
 
     if (this.vida <= 0) {
-      Object.keys(this.movimentos).forEach(key => {
-        this.movimentos[key] = false;
-      });
+      this.energia = 0
+      this.energiaMax = 0
+      this.atualizaHud(this.energia, this.vida)
       document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
+      return
     } else {
       if (this.mapa.entidades.monstros) {
         this.mapa.entidades.monstros.meshes.forEach((monstro) => {

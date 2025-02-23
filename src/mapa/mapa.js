@@ -40,7 +40,7 @@ export default class Mapa {
   }
 
   atualizaRelogio() {
-    this.tempo += 0.01
+    this.tempo += 0.02
     this.horarioSol = this.tempo * 0.2
   }
 
