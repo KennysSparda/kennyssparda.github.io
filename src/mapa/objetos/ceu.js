@@ -6,7 +6,7 @@ export default class Ceu {
     this.tamanhoMapa = tamanhoMapaMapa;
     this.multiplicadorTamanho = multiplicadorTamanho
 
-    this.carregarSkybox();
+    this.carregarSkyboxEstrelas()
   }
 
   carregarSkybox() {
@@ -65,10 +65,10 @@ export default class Ceu {
     }
   }
 
-  atualizarCeoEstrelas() {
+  atualizarCeoEstrelas(horarioSol) {
     if (!this.skyboxEstrelas || !this.skyboxCeu || !this.skyboxEstrelas.material || !this.skyboxCeu.material) return
 
-    const solAltura = Math.sin(this.horarioSol)
+    const solAltura = Math.sin(horarioSol)
     
     this.skyboxEstrelas.material.opacity = solAltura < 0 ? 1 : 1 - solAltura
     this.skyboxCeu.material.opacity = solAltura > 0 ? 1 : 1 + solAltura

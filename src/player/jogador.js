@@ -8,7 +8,11 @@ export default class jogador {
     this.scene = this.mapa.scene
     this.sensibilidadeMouse = 0.001
     this.movimentos = { frente: false, tras: false, esquerda: false, direita: false, pulando: false, agachando: false, correndo: false}
-    
+    this.collider = {
+      base: new THREE.Vector3(), // Ponto inferior da cápsula
+      topo: new THREE.Vector3(), // Ponto superior da cápsula
+      raio: 1.0 // Raio da cápsula
+    };
     // Física
     this.velocidadeY = 0
     this.gravidade = -0.002
@@ -162,7 +166,6 @@ export default class jogador {
     }
   }
   
-  
   movimentoAgachar() {
     if(this.movimentos.agachando) {
       this.jogadorPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY - this.alturaAgachado, this.suavizacaoAgachamento)
@@ -189,7 +192,13 @@ export default class jogador {
       this.energia = 0
       this.energiaMax = 0
       this.atualizaHud(this.energia, this.vida)
-      document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
+      document.querySelector('div#fimdejogo').textContent = "SE FODEU"
+      document.querySelector('a#tentarNovamente').style.display = 'block'
+      this.camera.position.set(
+        this.jogadorPositionX,
+        THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY, 0.1),
+        this.jogadorPositionZ
+      );
       return
     } else {
       if (this.mapa.entidades.monstros) {

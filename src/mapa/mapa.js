@@ -26,7 +26,7 @@ export default class Mapa {
     document.body.appendChild(this.renderer.domElement)
 
     this.terreno = new Terreno(this.scene, this.tamanhoX, this.tamanhoZ, this.nivelDetalhesMapa, this.alturaEscala)
-    this.ceu = new Ceu(this.scene, 100)
+    this.ceu = new Ceu(this.scene, 100, 1)
     this.sol = new Sol(this.scene, this.tamanho, 10, this.viewDistanceMax - 1)
     this.lua = new Lua(this.scene, this.tamanho, 5, this.viewDistanceMax - 1)
     this.agua = new Agua(this.scene, this.tamanhoX, this.tamanhoZ, 5,this.alturaDaAgua)
@@ -48,7 +48,7 @@ export default class Mapa {
     this.atualizaRelogio()
     this.sol.atualizar(this.tempo)
     this.lua.atualizar(this.tempo)
-
+    this.ceu.atualizarCeoEstrelas(this.horarioSol)
     this.entidades.gerenciarEntidades(this.horarioSol)
 
     if (this.entidades.monstros) {
