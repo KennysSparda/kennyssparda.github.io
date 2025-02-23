@@ -14,17 +14,15 @@ export default class gerenciarCriaturas {
 
   gerenciarCriaturas(horarioSol) {
     const solAltura = Math.sin(horarioSol)
-    // Criar Monstros à noite
     if (solAltura < 0) {
       if (!this.monstros) {
-        // this.monstros = new Monstros(this.mapa)
+        this.monstros = new Monstros(this.mapa)
       }
       if(this.passaros) {
         this.passaros.meshes.forEach(mesh => this.scene.remove(mesh))
         this.passaros = null
       }
     }
-    // Remover Monstros ao amanhecer
     if (solAltura > 0) {
       if (!this.passaros) {
         this.passaros = new Passaros(this.mapa)

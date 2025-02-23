@@ -5,6 +5,7 @@ export default class Lua {
     this.scene = scene
     this.tamanhoMapa = tamanhoMapa
     this.tamanho = tamanhoLua
+    this.segmentos = 200
     this.carregarTexturas()
     this.criarLua()
     this.criarLuzRefletida()
@@ -17,7 +18,7 @@ export default class Lua {
   }
 
   criarLua() {
-    const geometria = new THREE.SphereGeometry(this.tamanho, 50,50)
+    const geometria = new THREE.SphereGeometry(this.tamanho, this.segmentos,this.segmentos)
     this.material = new THREE.MeshPhongMaterial({
       map: this.textura
     })

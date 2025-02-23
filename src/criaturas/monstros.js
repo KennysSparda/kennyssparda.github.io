@@ -2,13 +2,14 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export default class meshs {
-  constructor(mapa, quantidade = 5) {
+  constructor(mapa, quantidade = 1) {
     this.mapa = mapa
     this.scene = mapa.scene
     this.meshes = []
     this.mixer = []
     this.velocidade = 0.05
     this.quantidade = quantidade
+    this.dano = 0.01
 
     const loader = new GLTFLoader()
 

@@ -1,4 +1,4 @@
-import { THREE } from '../etc/imports.js';
+import * as THREE from 'three'
 
 export default class Ceu {
   constructor(scene, tamanho) {
@@ -10,15 +10,13 @@ export default class Ceu {
 
   carregarSkybox() {
     const loader = new THREE.CubeTextureLoader();
-    loader.setPath('/assets/mapa/ceu/');
-
     const arquivos = [
-      'px.jpg', // direita
-      'nx.jpg', // esquerda
-      'py.jpg', // cima
-      'ny.jpg', // baixo
-      'pz.jpg', // frente
-      'nz.jpg'  // trás
+      '/assets/mapa/ceu/ceuDiurno.png', // direita
+      '/assets/mapa/ceu/ceuDiurno.png', // esquerda
+      '/assets/mapa/ceu/ceuDiurno.png', // cima
+      '/assets/mapa/ceu/ceuDiurno.png', // baixo
+      '/assets/mapa/ceu/ceuDiurno.png', // frente
+      '/assets/mapa/ceu/ceuDiurno.png'  // trás
     ];
 
     const skyboxTexture = loader.load(arquivos, () => {

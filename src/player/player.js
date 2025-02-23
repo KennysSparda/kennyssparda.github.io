@@ -10,26 +10,29 @@ export default class Player {
     this.movimentos = { frente: false, tras: false, esquerda: false, direita: false, pulando: false, agachando: false, correndo: false}
     
     // Física
-    this.velocidadeInicial = 0.05
-    this.velocidadeAtual = this.velocidadeInicial
-    this.velocidadeCorrida = 0.1
-
     this.velocidadeY = 0
     this.gravidade = -0.002
-    this.forcaPulo = 0.05
     this.suavizacaoAgachamento = 0.05
     this.alturaAgachado = 0.4
-
-    this.stamina = 5
+    
     this.alturaJogador = 0.5
-
+    
     this.playerPositionX = 0
     this.playerPositionZ = 0
     this.playerPositionY = this.terreno.obterAlturaTerreno(this.playerPositionX, this.playerPositionZ) + this.alturaJogador
-
+    
     this.limiteSubida = 0.2 
-
+    
     this.camera.position.set(this.playerPositionX, this.playerPositionY, this.playerPositionZ)
+    
+    // Atributos
+    this.velocidadeCorrida = 0.1
+    this.velocidadeInicial = 0.05
+    this.velocidadeAtual = this.velocidadeInicial
+    this.forcaPulo = 0.05
+    this.energia = 5
+    this.vida = 3
+    this.regeneracaoVida=0.1
 
     // Eventos de entrada
     document.addEventListener('keydown', (e) => this.teclaPressionada(e), false)
@@ -92,8 +95,9 @@ export default class Player {
     }
   }
 
-  atualizaHud(stamina) {
-    document.querySelector('#stamina').value = stamina
+  atualizaHud(energia, vida) {
+    document.querySelector('#energia').value = energia
+    document.querySelector('#vida').value = vida
   }
 
   update() {
@@ -104,17 +108,17 @@ export default class Player {
 
     const direita = new THREE.Vector3().crossVectors(this.camera.up, direcao).normalize()
 
-    if (this.movimentos.correndo && this.stamina > 0) {
+    if (this.movimentos.correndo && this.energia > 0) {
       this.velocidadeAtual = this.velocidadeCorrida
-      this.stamina -= 0.02 
-      if (this.stamina < 0) {
+      this.energia -= 0.02 
+      if (this.energia < 0) {
         this.velocidadeAtual = this.velocidadeInicial
-        this.stamina = 0
+        this.energia = 0
       }
     } else {
       this.velocidadeAtual = this.velocidadeInicial
-      if (this.stamina < 5) {
-        this.stamina += 0.01 
+      if (this.energia < 5) {
+        this.energia += 0.01 
       }
     }
   
@@ -145,7 +149,24 @@ export default class Player {
         this.playerPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.playerPositionY + this.alturaJogador, this.suavizacaoAgachamento)
       }
     }
+
+    if (this.mapa.criaturas.monstros) {
+      this.mapa.criaturas.monstros.meshes.forEach((monstro) => {
+        const distancia = Math.sqrt(
+          Math.pow(this.playerPositionX - monstro.position.x, 2) +
+          Math.pow(this.playerPositionZ - monstro.position.z, 2)
+        )
+        if (distancia < 0.5) {
+          this.vida-=this.mapa.criaturas.monstros.dano
+          document.querySelector('label#log').innerHTML += `-${this.mapa.criaturas.monstros.dano}`
+          document.body.style.backgroundColor = 'rgba(255, 0, 0, 0.5)' // Tela pisca vermelha
+          setTimeout(() => document.body.style.backgroundColor = 'transparent', 200)
+          this.atualizaHud(this.energia, this.vida)
+        }
+      })
+    }
+    this.vida+=this.regeneracaoVida
     this.camera.position.set(this.playerPositionX, this.playerPositionY, this.playerPositionZ)
-    this.atualizaHud(this.stamina)
+    this.atualizaHud(this.energia, this.vida)
   }
 }
