@@ -16,7 +16,7 @@ export default class Mapa {
     this.tamanhoX = this.tamanho
     this.tamanhoZ = this.tamanho
 
-    this.nivelDetalhesMapa = 512
+    this.nivelDetalhesMapa = 2048
     this.alturaEscala = 2
     this.alturaDaAgua = 0.5
 
@@ -27,56 +27,63 @@ export default class Mapa {
     this.carregarSkyboxEstrelas()
 
     this.terreno = new Terreno(this.scene, this.tamanhoX, this.tamanhoZ, this.nivelDetalhesMapa, this.alturaEscala)
-    this.sol = new Sol(this.scene, this.tamanho)
-    this.lua = new Lua(this.scene, this.tamanho)
+    this.sol = new Sol(this.scene, this.tamanho, 20)
+    this.lua = new Lua(this.scene, this.tamanho, 10)
     this.agua = new Agua(this.scene, this.tamanhoX, this.tamanhoZ, 0.6)
 
     this.criaturas = new Criaturas(this)
 
     this.tempo = 0
-    this.faseLua = 0
+    this.horarioSol = null
 
     this.luzAmbiente = new THREE.AmbientLight(0x404040, 0.5) 
     this.scene.add(this.luzAmbiente)
   }
 
   carregarSkyboxEstrelas() {
-    const loader = new THREE.TextureLoader()
-    this.ceuNoturnoTextura = null
-    this.ceuDiurnoTextura = null
-   
-    loader.load(assets.ceuNoturnoTextura, (ceuNoturnoTextura) => {
-      this.ceuNoturnoTextura = ceuNoturnoTextura
-      this.checkTexturesLoaded()
-    })
-    loader.load(assets.ceuDiurnoTextura, (ceuDiurnoTextura) => {
-      this.ceuDiurnoTextura = ceuDiurnoTextura
-      this.checkTexturesLoaded()
-    })
+    const loader = new THREE.TextureLoader();
+    this.ceuNoturnoTextura = null;
+    this.ceuDiurnoTextura = null;
+    
+    loader.load(assets.ceuNoturnoTextura, (texture) => {
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      this.ceuNoturnoTextura = texture;
+      this.checkTexturesLoaded();
+    });
+  
+    loader.load(assets.ceuDiurnoTextura, (texture) => {
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      this.ceuDiurnoTextura = texture;
+      this.checkTexturesLoaded();
+    });
   }
-
+  
   checkTexturesLoaded() {
     if (this.ceuNoturnoTextura && this.ceuDiurnoTextura) {
-     
-      const geometria = new THREE.BoxGeometry(this.tamanho * 5, this.tamanho * 5, this.tamanho * 5)
-      this.materialEstrelas = new THREE.MeshBasicMaterial({
+      
+      const geometria = new THREE.SphereGeometry(this.tamanho * 5, 64, 64); // Esfera com mais detalhes
+  
+      const materialEstrelas = new THREE.MeshBasicMaterial({
         map: this.ceuNoturnoTextura,
-        side: THREE.BackSide,
+        side: THREE.BackSide, // Renderiza dentro da esfera
         transparent: true,
         opacity: 0
-      })
-      this.materialCeu = new THREE.MeshBasicMaterial({
+      });
+  
+      const materialCeu = new THREE.MeshBasicMaterial({
         map: this.ceuDiurnoTextura,
         side: THREE.BackSide,
         transparent: true,
         opacity: 1
-      })
-     
-      this.skyboxEstrelas = new THREE.Mesh(geometria, this.materialEstrelas)
-      this.skyboxCeu = new THREE.Mesh(geometria, this.materialCeu)
-
-      this.scene.add(this.skyboxEstrelas)
-      this.scene.add(this.skyboxCeu)
+      });
+  
+      this.skyboxEstrelas = new THREE.Mesh(geometria, materialEstrelas);
+      this.skyboxCeu = new THREE.Mesh(geometria, materialCeu);
+  
+      this.scene.add(this.skyboxEstrelas);
+      this.scene.add(this.skyboxCeu);
     }
   }
 

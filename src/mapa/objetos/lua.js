@@ -1,10 +1,10 @@
 import * as THREE from 'three'
 
 export default class Lua {
-  constructor(scene, tamanho) {
+  constructor(scene, tamanhoMapa, tamanhoLua) {
     this.scene = scene
-    this.tamanho = tamanho
-
+    this.tamanhoMapa = tamanhoMapa
+    this.tamanho = tamanhoLua
     this.carregarTexturas()
     this.criarLua()
     this.criarLuzRefletida()
@@ -17,7 +17,7 @@ export default class Lua {
   }
 
   criarLua() {
-    const geometria = new THREE.SphereGeometry(3.5, 50,50)
+    const geometria = new THREE.SphereGeometry(this.tamanho, 50,50)
     this.material = new THREE.MeshPhongMaterial({
       map: this.textura
     })
@@ -32,7 +32,7 @@ export default class Lua {
   }
 
   atualizar(tempo) {
-    const raioOrbita = this.tamanho / 2 
+    const raioOrbita = this.tamanhoMapa / 2 
     const angulo = tempo * 0.2 + Math.PI
 
     this.lua.position.set(Math.cos(angulo) * raioOrbita, Math.sin(angulo) * raioOrbita, 0)

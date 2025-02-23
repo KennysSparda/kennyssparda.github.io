@@ -17,7 +17,7 @@ export default class gerenciarCriaturas {
     // Criar Monstros à noite
     if (solAltura < 0) {
       if (!this.monstros) {
-        this.monstros = new Monstros(this.mapa)
+        // this.monstros = new Monstros(this.mapa)
       }
       if(this.passaros) {
         this.passaros.meshes.forEach(mesh => this.scene.remove(mesh))
