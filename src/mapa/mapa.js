@@ -10,11 +10,11 @@ export default class Mapa {
   constructor() {
     this.scene = new THREE.Scene()
     
-    this.tamanho = 10000
+    this.tamanho = 100
     this.viewDistanceMax = 20000
     this.tamanhoZ = this.tamanho
-    this.nivelDetalhesMapa = 2500
-    this.alturaEscala = 100
+    this.nivelDetalhesMapa = 500
+    this.alturaEscala = 2
     this.alturaDaAgua = 0.5
     this.viewDistanceMin = 0.1
     this.tamanhoX = this.tamanho
@@ -25,7 +25,7 @@ export default class Mapa {
     document.body.appendChild(this.renderer.domElement)
 
     this.terreno = new Terreno(this.scene, this.tamanhoX, this.tamanhoZ, this.nivelDetalhesMapa, this.alturaEscala)
-    this.ceu = new Ceu(this.scene, 1000)
+    this.ceu = new Ceu(this.scene, 100)
     this.sol = new Sol(this.scene, this.tamanho, 20)
     this.lua = new Lua(this.scene, this.tamanho, 10)
     this.agua = new Agua(this.scene, this.tamanhoX, this.tamanhoZ, 0.6)

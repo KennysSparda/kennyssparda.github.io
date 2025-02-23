@@ -1,6 +1,6 @@
 import { THREE } from '../etc/imports.js'
 
-export default class Player {
+export default class jogador {
   constructor(mapa, terreno) {
     this.mapa = mapa
     this.terreno = terreno
@@ -17,13 +17,13 @@ export default class Player {
     
     this.alturaJogador = 0.5
     
-    this.playerPositionX = 0
-    this.playerPositionZ = 0
-    this.playerPositionY = this.terreno.obterAlturaTerreno(this.playerPositionX, this.playerPositionZ) + this.alturaJogador
+    this.jogadorPositionX = 0
+    this.jogadorPositionZ = 0
+    this.jogadorPositionY = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ) + this.alturaJogador
     
     this.limiteSubida = 0.2 
     
-    this.camera.position.set(this.playerPositionX, this.playerPositionY, this.playerPositionZ)
+    this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     
     // Atributos
     this.velocidadeCorrida = 0.1
@@ -83,13 +83,13 @@ export default class Player {
 
   adicionarGravidade() {
     this.velocidadeY += this.gravidade
-    this.playerPositionY += this.velocidadeY
+    this.jogadorPositionY += this.velocidadeY
   }
 
   colisaoChao() {
-    const alturaTerreno = this.terreno.obterAlturaTerreno(this.playerPositionX, this.playerPositionZ)
-    if (this.playerPositionY <= alturaTerreno + this.alturaJogador) {
-        this.playerPositionY = alturaTerreno + this.alturaJogador
+    const alturaTerreno = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ)
+    if (this.jogadorPositionY <= alturaTerreno + this.alturaJogador) {
+        this.jogadorPositionY = alturaTerreno + this.alturaJogador
         this.velocidadeY = 0
         this.movimentos.pulando = false
     }
@@ -128,14 +128,14 @@ export default class Player {
     if (this.movimentos.esquerda) proximaPosicao.addScaledVector(direita, this.velocidadeAtual)
     if (this.movimentos.direita) proximaPosicao.addScaledVector(direita, -this.velocidadeAtual)
   
-    const alturaTerrenoAtual = this.terreno.obterAlturaTerreno(this.playerPositionX, this.playerPositionZ)
+    const alturaTerrenoAtual = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ)
     const alturaTerrenoFutura = this.terreno.obterAlturaTerreno(proximaPosicao.x, proximaPosicao.z)
     const diferencaSubida = alturaTerrenoFutura - alturaTerrenoAtual
   
-    if (diferencaSubida <= this.limiteSubida || (this.movimentos.pulando && diferencaSubida <= this.playerPositionY)) {
-      this.playerPositionX = proximaPosicao.x
+    if (diferencaSubida <= this.limiteSubida || (this.movimentos.pulando && diferencaSubida <= this.jogadorPositionY)) {
+      this.jogadorPositionX = proximaPosicao.x
       
-      this.playerPositionZ = proximaPosicao.z
+      this.jogadorPositionZ = proximaPosicao.z
     }
 
     this.adicionarGravidade()
@@ -143,22 +143,22 @@ export default class Player {
     this.colisaoChao()
 
     if(this.movimentos.agachando) {
-      this.playerPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.playerPositionY - this.alturaAgachado, this.suavizacaoAgachamento)
+      this.jogadorPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY - this.alturaAgachado, this.suavizacaoAgachamento)
     } else {
-      if (this.camera.position.y < this.terreno.obterAlturaTerreno(this.playerPositionX, this.playerPositionZ) + this.alturaJogador) {
-        this.playerPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.playerPositionY + this.alturaJogador, this.suavizacaoAgachamento)
+      if (this.camera.position.y < this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ) + this.alturaJogador) {
+        this.jogadorPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY + this.alturaJogador, this.suavizacaoAgachamento)
       }
     }
 
     if (this.mapa.criaturas.monstros) {
       this.mapa.criaturas.monstros.meshes.forEach((monstro) => {
         const distancia = Math.sqrt(
-          Math.pow(this.playerPositionX - monstro.position.x, 2) +
-          Math.pow(this.playerPositionZ - monstro.position.z, 2)
+          Math.pow(this.jogadorPositionX - monstro.position.x, 2) +
+          Math.pow(this.jogadorPositionZ - monstro.position.z, 2)
         )
         if (distancia < 0.5) {
           this.vida-=this.mapa.criaturas.monstros.dano
-          document.querySelector('label#log').innerHTML += `-${this.mapa.criaturas.monstros.dano}`
+          // document.querySelector('label#log').innerHTML += `-${this.mapa.criaturas.monstros.dano}`
           document.body.style.backgroundColor = 'rgba(255, 0, 0, 0.5)' // Tela pisca vermelha
           setTimeout(() => document.body.style.backgroundColor = 'transparent', 200)
           this.atualizaHud(this.energia, this.vida)
@@ -166,7 +166,7 @@ export default class Player {
       })
     }
     this.vida+=this.regeneracaoVida
-    this.camera.position.set(this.playerPositionX, this.playerPositionY, this.playerPositionZ)
+    this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     this.atualizaHud(this.energia, this.vida)
   }
 }

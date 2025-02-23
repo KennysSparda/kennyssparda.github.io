@@ -21,5 +21,5 @@ const assets = {
   peixe01: '/assets/criaturas/peixes/peixe01/scene.gltf',
 
   // Sons
-  passaroSom: '/assets/som/birds-frogs-nature.mp3',
+  passarosSons: '/assets/som/birds-frogs-nature.mp3',
 }
