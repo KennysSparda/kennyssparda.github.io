@@ -21,7 +21,7 @@ export default class jogador {
     this.jogadorPositionZ = 0
     this.jogadorPositionY = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ) + this.alturaJogador
     
-    this.limiteSubida = 0.2 
+    this.limiteSubida = 0.2
     
     this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     
@@ -30,15 +30,21 @@ export default class jogador {
     this.velocidadeInicial = 0.05
     this.velocidadeAtual = this.velocidadeInicial
     this.forcaPulo = 0.05
-    this.energia = 5
-    this.vida = 3
-    this.regeneracaoVida=0.1
+    this.energiaMax = 5
+    this.energia = this.energiaMax
+    this.vidaMax = 100
+    this.vida = this.vidaMax
+    this.regeneracaoVida=0.01
 
     // Eventos de entrada
     document.addEventListener('keydown', (e) => this.teclaPressionada(e), false)
     document.addEventListener('keyup', (e) => this.teclaSolta(e), false)
     this.mapa.renderer.domElement.addEventListener('click', () => mapa.renderer.domElement.requestPointerLock())
     document.addEventListener('mousemove', (e) => this.movimentoMouse(e), false)
+
+    // Ajuste da hud
+    document.querySelector('#energia').max = this.energiaMax
+    document.querySelector('#vida').max = this.vidaMax
   }
 
   teclaPressionada(event) {
@@ -100,15 +106,8 @@ export default class jogador {
     document.querySelector('#vida').value = vida
   }
 
-  update() {
-    const direcao = new THREE.Vector3()
-    this.camera.getWorldDirection(direcao)
-    direcao.y = 0
-    direcao.normalize()
-
-    const direita = new THREE.Vector3().crossVectors(this.camera.up, direcao).normalize()
-
-    if (this.movimentos.correndo && this.energia > 0) {
+  atualizarCorrida() {
+    if (this.movimentos.correndo && this.movimentos.frente && this.energia > 0) {
       this.velocidadeAtual = this.velocidadeCorrida
       this.energia -= 0.02 
       if (this.energia < 0) {
@@ -117,11 +116,20 @@ export default class jogador {
       }
     } else {
       this.velocidadeAtual = this.velocidadeInicial
-      if (this.energia < 5) {
+      if (this.energia < this.energiaMax) {
         this.energia += 0.01 
       }
     }
-  
+  }
+
+  atualizarPosition() {
+    const direcao = new THREE.Vector3()
+    this.camera.getWorldDirection(direcao)
+    direcao.y = 0
+    direcao.normalize()
+
+    const direita = new THREE.Vector3().crossVectors(this.camera.up, direcao).normalize()
+
     const proximaPosicao = this.camera.position.clone() 
     if (this.movimentos.frente) proximaPosicao.addScaledVector(direcao, this.velocidadeAtual)
     if (this.movimentos.tras) proximaPosicao.addScaledVector(direcao, -this.velocidadeAtual)
@@ -137,11 +145,9 @@ export default class jogador {
       
       this.jogadorPositionZ = proximaPosicao.z
     }
+  }
 
-    this.adicionarGravidade()
-  
-    this.colisaoChao()
-
+  movimentoAgachar() {
     if(this.movimentos.agachando) {
       this.jogadorPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY - this.alturaAgachado, this.suavizacaoAgachamento)
     } else {
@@ -149,23 +155,46 @@ export default class jogador {
         this.jogadorPositionY = THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY + this.alturaJogador, this.suavizacaoAgachamento)
       }
     }
+  }
 
-    if (this.mapa.criaturas.monstros) {
-      this.mapa.criaturas.monstros.meshes.forEach((monstro) => {
-        const distancia = Math.sqrt(
-          Math.pow(this.jogadorPositionX - monstro.position.x, 2) +
-          Math.pow(this.jogadorPositionZ - monstro.position.z, 2)
-        )
-        if (distancia < 0.5) {
-          this.vida-=this.mapa.criaturas.monstros.dano
-          // document.querySelector('label#log').innerHTML += `-${this.mapa.criaturas.monstros.dano}`
-          document.body.style.backgroundColor = 'rgba(255, 0, 0, 0.5)' // Tela pisca vermelha
-          setTimeout(() => document.body.style.backgroundColor = 'transparent', 200)
-          this.atualizaHud(this.energia, this.vida)
-        }
-      })
+  update() {
+
+    this.atualizarCorrida() 
+  
+    this.atualizarPosition()
+
+    this.adicionarGravidade()
+  
+    this.colisaoChao()
+
+    this.movimentoAgachar()
+
+    if (this.vida <= 0) {
+      Object.keys(this.movimentos).forEach(key => {
+        this.movimentos[key] = false;
+      });
+      document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
+    } else {
+      if (this.mapa.entidades.monstros) {
+        this.mapa.entidades.monstros.meshes.forEach((monstro) => {
+          const distancia = Math.sqrt(
+            Math.pow(this.jogadorPositionX - monstro.position.x, 2) +
+            Math.pow(this.jogadorPositionZ - monstro.position.z, 2)
+          )
+          if (distancia < 1.5) {
+            if ( this.vida > 0){
+              this.vida -= this.mapa.entidades.monstros.dano
+              console.log(`-${this.mapa.entidades.monstros.dano}`)
+            }
+          }
+        })
+      }
     }
-    this.vida+=this.regeneracaoVida
+    
+    if (this.vida < this.vidaMax) {
+      this.vida+=this.regeneracaoVida
+    }
+
     this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     this.atualizaHud(this.energia, this.vida)
   }

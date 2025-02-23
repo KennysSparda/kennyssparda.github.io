@@ -1,3 +1,4 @@
+// LER CONFIG JSON AQUI 
 const assets = {
 
   // Terreno
@@ -15,10 +16,10 @@ const assets = {
   luaTextura: '/assets/mapa/lua/lua.jpg',
   luaTopografia: '/assets/mapa/lua/luaTopografia.jpg',
 
-  // Criaturas
-  passaros: '/assets/criaturas/passaros/scene.gltf',
-  monstros: '/assets/criaturas/monstros/scene.gltf',
-  peixe01: '/assets/criaturas/peixes/peixe01/scene.gltf',
+  // entidades
+  passaros: '/assets/entidades/passaros/scene.gltf',
+  monstros: '/assets/entidades/monstros/scene.gltf',
+  peixe01: '/assets/entidades/peixes/peixe01/scene.gltf',
 
   // Sons
   passarosSons: '/assets/som/birds-frogs-nature.mp3',

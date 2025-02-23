@@ -11,6 +11,7 @@ const jogador = new Jogador(mapa, mapa.terreno)
 const sounds = new Sound(mapa, jogador)
 
 sounds.playPassaros()
+
 function animate() {
   requestAnimationFrame(animate)
   
@@ -19,9 +20,9 @@ function animate() {
   mapa.render(jogador)
   
   const deltaTime = clock.getDelta()
-  if (mapa.criaturas.passaros) mapa.criaturas.passaros.update(deltaTime)
-  if (mapa.criaturas.monstros) mapa.criaturas.monstros.update(deltaTime)
-  if (mapa.criaturas.peixes) mapa.criaturas.peixes.update(deltaTime)
+  if (mapa.entidades.passaros) mapa.entidades.passaros.update(deltaTime)
+  if (mapa.entidades.monstros) mapa.entidades.monstros.update(deltaTime)
+  if (mapa.entidades.peixes) mapa.entidades.peixes.update(deltaTime)
 }
 
 animate()

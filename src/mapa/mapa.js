@@ -4,20 +4,21 @@ import Ceu from './objetos/ceu.js'
 import Sol from './objetos/sol.js'
 import Lua from './objetos/lua.js'
 import Agua from './objetos/agua.js'
-import Criaturas from '../criaturas/criaturas.js'
+import Entidades from '../entidades/entidades.js'
 
 export default class Mapa {
   constructor() {
     this.scene = new THREE.Scene()
     
-    this.tamanho = 100
-    this.viewDistanceMax = 20000
-    this.tamanhoZ = this.tamanho
-    this.nivelDetalhesMapa = 500
+    this.tamanho = 50
+
+    this.viewDistanceMin = 0.1
+    this.viewDistanceMax = 200
+    this.nivelDetalhesMapa = 50
     this.alturaEscala = 2
     this.alturaDaAgua = 0.5
-    this.viewDistanceMin = 0.1
     this.tamanhoX = this.tamanho
+    this.tamanhoZ = this.tamanho
     
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, this.viewDistanceMin, this.viewDistanceMax)
     this.renderer = new THREE.WebGLRenderer()
@@ -26,10 +27,10 @@ export default class Mapa {
 
     this.terreno = new Terreno(this.scene, this.tamanhoX, this.tamanhoZ, this.nivelDetalhesMapa, this.alturaEscala)
     this.ceu = new Ceu(this.scene, 100)
-    this.sol = new Sol(this.scene, this.tamanho, 20)
-    this.lua = new Lua(this.scene, this.tamanho, 10)
-    this.agua = new Agua(this.scene, this.tamanhoX, this.tamanhoZ, 0.6)
-    this.criaturas = new Criaturas(this)
+    this.sol = new Sol(this.scene, this.tamanho, 10, this.viewDistanceMax - 1)
+    this.lua = new Lua(this.scene, this.tamanho, 5, this.viewDistanceMax - 1)
+    this.agua = new Agua(this.scene, this.tamanhoX, this.tamanhoZ, 5,this.alturaDaAgua)
+    this.entidades = new Entidades(this)
 
     this.tempo = 0
     this.horarioSol = null
@@ -43,16 +44,17 @@ export default class Mapa {
     this.horarioSol = this.tempo * 0.2
   }
 
-  render(player) {
+  render(jogador) {
     this.atualizaRelogio()
     this.sol.atualizar(this.tempo)
     this.lua.atualizar(this.tempo)
 
-    this.criaturas.gerenciarCriaturas(this.horarioSol)
+    this.entidades.gerenciarEntidades(this.horarioSol)
 
-    if (this.criaturas.monstros) {
-      this.criaturas.monstros.seguir(player)
+    if (this.entidades.monstros) {
+      this.entidades.monstros.seguir(jogador)
     }
+
     this.renderer.render(this.scene, this.camera)
   }
 }

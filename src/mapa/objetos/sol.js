@@ -1,10 +1,11 @@
 import * as THREE from 'three'
 
 export default class Sol {
-  constructor(scene, tamanhoMapa, tamanhoSol) {
+  constructor(scene, tamanhoMapa, tamanhoSol, raioOrbita) {
     this.scene = scene
     this.tamanhoMapa = tamanhoMapa
     this.tamanho = tamanhoSol
+    this.raio = raioOrbita
     this.criarSol()
   }
 
@@ -16,7 +17,7 @@ export default class Sol {
   }
 
   atualizar(tempo) {
-    const raio = this.tamanhoMapa * 2.5
+    const raio = this.raio
     this.horarioSol = tempo * 0.2
     
     this.sol.position.set(Math.cos(this.horarioSol) * raio, Math.sin(this.horarioSol) * raio, 0)

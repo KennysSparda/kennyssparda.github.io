@@ -1,11 +1,12 @@
 import * as THREE from 'three'
 
 export default class Lua {
-  constructor(scene, tamanhoMapa, tamanhoLua) {
+  constructor(scene, tamanhoMapa, tamanhoLua, raioOrbita) {
     this.scene = scene
     this.tamanhoMapa = tamanhoMapa
     this.tamanho = tamanhoLua
     this.segmentos = 200
+    this.raio = raioOrbita
     this.carregarTexturas()
     this.criarLua()
     this.criarLuzRefletida()
@@ -33,7 +34,7 @@ export default class Lua {
   }
 
   atualizar(tempo) {
-    const raioOrbita = this.tamanhoMapa / 2 
+    const raioOrbita = this.raio
     const angulo = tempo * 0.2 + Math.PI
 
     this.lua.position.set(Math.cos(angulo) * raioOrbita, Math.sin(angulo) * raioOrbita, 0)
