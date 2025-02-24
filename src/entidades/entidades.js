@@ -1,6 +1,10 @@
 import Monstros from './monstros.js'
 import Passaros from './passaros.js'
 import Peixes from './peixes.js'
+import Plantas from './plantas.js'
+import posicoes from './posicoesPlantas.js'
+
+
 
 export default class Entidades {
   constructor(mapa) {
@@ -9,6 +13,13 @@ export default class Entidades {
     this.passaros = null
     this.monstros = null
     this.peixes = new Peixes(this.mapa)
+    
+    // Criando diferentes tipos de vegetação
+    
+    this.arvores = new Plantas(this.mapa, assets.arvore01, 1, true, true)
+    if(this.arvores.modeloOriginal) {
+      this.adicionarPlantas()
+    }
   }
 
   gerenciarEntidades(horarioSol) {
@@ -31,5 +42,11 @@ export default class Entidades {
         this.monstros = null
       }
     }
+  }
+
+  adicionarPlantas() {
+    posicoes.forEach(pos => {
+      this.arvores.adicionarPlanta(pos);
+    });
   }
 }

@@ -1,9 +1,10 @@
 import { THREE } from '../etc/imports.js'
 
 export default class jogador {
-  constructor(mapa, terreno) {
+  constructor(mapa, terreno, sounds) {
     this.mapa = mapa
     this.terreno = terreno
+    this.sounds = sounds
     this.camera = this.mapa.camera
     this.scene = this.mapa.scene
     this.sensibilidadeMouse = 0.001
@@ -25,7 +26,7 @@ export default class jogador {
     this.jogadorPositionZ = 0
     this.jogadorPositionY = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ) + this.alturaJogador
     
-    this.limiteSubida = 5
+    this.limiteSubida = 1
     
     this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     
@@ -45,10 +46,17 @@ export default class jogador {
     document.addEventListener('keyup', (e) => this.teclaSolta(e), false)
     this.mapa.renderer.domElement.addEventListener('click', () => mapa.renderer.domElement.requestPointerLock())
     document.addEventListener('mousemove', (e) => this.movimentoMouse(e), false)
+    document.addEventListener('mousedown', (e) => this.cliquePressionado(e), false)
 
     // Ajuste da hud
     document.querySelector('#energia').max = this.energiaMax
     document.querySelector('#vida').max = this.vidaMax
+  }
+
+  cliquePressionado(event) {
+    switch (event.code) {
+      default: console.log('apertou: ', event,event.code)
+    }
   }
 
   teclaPressionada(event) {
@@ -176,6 +184,24 @@ export default class jogador {
     }
   }
 
+  fimJogo() {
+    this.energia = 0
+    this.energiaMax = 0
+    this.atualizaHud(this.energia, this.vida)
+    document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
+    document.querySelector('a#tentarNovamente').style.display = 'block'
+    this.camera.position.set(
+      this.jogadorPositionX,
+      THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY, 0.1),
+      this.jogadorPositionZ
+    );
+
+    document.removeEventListener('keydown', (e) => this.teclaPressionada(e), false)
+    document.removeEventListener('keyup', (e) => this.teclaSolta(e), false)
+    document.removeEventListener('mousemove', (e) => this.movimentoMouse(e), false)
+    document.removeEventListener('mousedown', (e) => this.cliquePressionado(e), false)
+  }
+
   update() {
 
     this.atualizarCorrida() 
@@ -189,17 +215,7 @@ export default class jogador {
     this.movimentoAgachar()
 
     if (this.vida <= 0) {
-      this.energia = 0
-      this.energiaMax = 0
-      this.atualizaHud(this.energia, this.vida)
-      document.querySelector('div#fimdejogo').textContent = "SE FODEU"
-      document.querySelector('a#tentarNovamente').style.display = 'block'
-      this.camera.position.set(
-        this.jogadorPositionX,
-        THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY, 0.1),
-        this.jogadorPositionZ
-      );
-      return
+      this.fimJogo()
     } else {
       if (this.mapa.entidades.monstros) {
         this.mapa.entidades.monstros.meshes.forEach((monstro) => {
@@ -207,6 +223,11 @@ export default class jogador {
             Math.pow(this.jogadorPositionX - monstro.position.x, 2) +
             Math.pow(this.jogadorPositionZ - monstro.position.z, 2)
           )
+          if (distancia < 5) {
+            this.sounds.playMonstros()
+          } else {
+            this.sounds.stopMonstros()
+          }
           if (distancia < 1.5) {
             if ( this.vida > 0){
               this.vida -= this.mapa.entidades.monstros.dano
