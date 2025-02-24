@@ -29,7 +29,7 @@ export default class Lua {
   }
 
   criarLuzRefletida() {
-    this.luzRefletida = new THREE.DirectionalLight(0xffffff, 0.3)
+    this.luzRefletida = new THREE.DirectionalLight(0xffffff, 0.1)
     this.scene.add(this.luzRefletida)
   }
 

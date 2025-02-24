@@ -42,22 +42,23 @@ export default class jogador {
     this.regeneracaoVida=0.01
 
     // Eventos de entrada
-    document.addEventListener('keydown', (e) => this.teclaPressionada(e), false)
-    document.addEventListener('keyup', (e) => this.teclaSolta(e), false)
     this.mapa.renderer.domElement.addEventListener('click', () => mapa.renderer.domElement.requestPointerLock())
-    document.addEventListener('mousemove', (e) => this.movimentoMouse(e), false)
-    document.addEventListener('mousedown', (e) => this.cliquePressionado(e), false)
+
+    this.teclaPressionadaHandler = this.teclaPressionada.bind(this)
+    this.teclaSoltaHandler = this.teclaSolta.bind(this)
+    this.movimentoMouseHandler = this.movimentoMouse.bind(this)
+
+    document.addEventListener('keydown', this.teclaPressionadaHandler, false)
+    document.addEventListener('keyup', this.teclaSoltaHandler, false)
+    document.addEventListener('mousemove', this.movimentoMouseHandler, false)
+    this.mapa.renderer.domElement.addEventListener('click', () => this.mapa.renderer.domElement.requestPointerLock())
+
 
     // Ajuste da hud
     document.querySelector('#energia').max = this.energiaMax
     document.querySelector('#vida').max = this.vidaMax
   }
 
-  cliquePressionado(event) {
-    switch (event.code) {
-      default: console.log('apertou: ', event,event.code)
-    }
-  }
 
   teclaPressionada(event) {
     switch (event.code) {
@@ -190,17 +191,18 @@ export default class jogador {
     this.atualizaHud(this.energia, this.vida)
     document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
     document.querySelector('a#tentarNovamente').style.display = 'block'
+
     this.camera.position.set(
       this.jogadorPositionX,
-      THREE.MathUtils.lerp(this.camera.position.y, this.jogadorPositionY, 0.1),
+      THREE.MathUtils.lerp(this.camera.position.y, 0, 0.1),
       this.jogadorPositionZ
     );
 
-    document.removeEventListener('keydown', (e) => this.teclaPressionada(e), false)
-    document.removeEventListener('keyup', (e) => this.teclaSolta(e), false)
-    document.removeEventListener('mousemove', (e) => this.movimentoMouse(e), false)
-    document.removeEventListener('mousedown', (e) => this.cliquePressionado(e), false)
-  }
+    // Remover eventos corretamente
+    document.removeEventListener('keydown', this.teclaPressionadaHandler, false)
+    document.removeEventListener('keyup', this.teclaSoltaHandler, false)
+    document.removeEventListener('mousemove', this.movimentoMouseHandler, false)
+}
 
   update() {
 
@@ -231,7 +233,6 @@ export default class jogador {
           if (distancia < 1.5) {
             if ( this.vida > 0){
               this.vida -= this.mapa.entidades.monstros.dano
-              console.log(`-${this.mapa.entidades.monstros.dano}`)
             }
           }
         })

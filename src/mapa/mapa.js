@@ -29,7 +29,7 @@ export default class Mapa {
     this.terreno = new Terreno(this.scene, this.tamanhoX, this.tamanhoZ, this.nivelDetalhesMapa, this.alturaEscala)
     this.ceu = new Ceu(this.scene, this.tamanho, 1000)
     this.sol = new Sol(this.scene, this.tamanho, 100, 5000)
-    this.lua = new Lua(this.scene, this.tamanho, 50, 5000)
+    this.lua = new Lua(this.scene, this.tamanho, 20, 700)
     this.agua = new Agua(this.scene, this.tamanhoX, this.tamanhoZ, 5,this.alturaDaAgua)
     this.entidades = new Entidades(this)
 
@@ -65,9 +65,9 @@ export default class Mapa {
 
     this.gerenciarSons()
 
-    // if (this.entidades.monstros) {
-    //   this.entidades.monstros.seguir(jogador)
-    // }
+    if (this.entidades.monstros) {
+      this.entidades.monstros.seguir(jogador)
+    }
 
     this.renderer.render(this.scene, this.camera)
   }
