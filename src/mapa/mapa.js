@@ -24,6 +24,10 @@ export default class Mapa {
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, this.viewDistanceMin, this.viewDistanceMax)
     this.renderer = new THREE.WebGLRenderer()
     this.renderer.setSize(window.innerWidth, window.innerHeight)
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Mantém sombras mais suaves
+    this.renderer.physicallyCorrectLights = true; // Iluminação realista
+
     document.body.appendChild(this.renderer.domElement)
 
     this.terreno = new Terreno(this.scene, this.tamanhoX, this.tamanhoZ, this.nivelDetalhesMapa, this.alturaEscala)
@@ -36,7 +40,7 @@ export default class Mapa {
     this.tempo = 0
     this.horarioSol = null
 
-    this.luzAmbiente = new THREE.AmbientLight(0x404040, 0.5) 
+    this.luzAmbiente = new THREE.AmbientLight(0x404040, 0.3) 
     this.scene.add(this.luzAmbiente)
   }
   
@@ -52,7 +56,7 @@ export default class Mapa {
   }
 
   atualizaRelogio() {
-    this.tempo += 0.01
+    this.tempo += 0.001
     this.horarioSol = this.tempo * 0.2
   }
 

@@ -34,6 +34,8 @@ export default class Terreno {
             this.terreno = new THREE.Mesh(geometriaChao, materialTerreno)
             
             this.terreno.position.set(0, 0, 0)
+            this.terreno.castShadow = true;
+            this.terreno.receiveShadow = true;
             this.terreno.name = "terreno" 
             this.scene.add(this.terreno)
 

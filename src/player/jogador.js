@@ -1,3 +1,4 @@
+import Passaros from '../entidades/passaros.js'
 import { THREE } from '../etc/imports.js'
 
 export default class jogador {
@@ -31,6 +32,7 @@ export default class jogador {
     this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     
     // Atributos
+    this.morto = false
     this.velocidadeCorrida = 0.1
     this.velocidadeInicial = 0.05
     this.velocidadeAtual = this.velocidadeInicial
@@ -117,6 +119,8 @@ export default class jogador {
   atualizaHud(energia, vida) {
     document.querySelector('#energia').value = energia
     document.querySelector('#vida').value = vida
+    document.querySelector('#pos').textContent = `X: ${parseFloat(this.jogadorPositionX.toFixed(2))}, Y: ${parseFloat(this.jogadorPositionY.toFixed(2))}, Z: ${parseFloat(this.jogadorPositionZ.toFixed(2))}`
+
   }
 
   atualizarCorrida() {
@@ -188,21 +192,19 @@ export default class jogador {
   fimJogo() {
     this.energia = 0
     this.energiaMax = 0
+    this.regeneracaoVida = 0
+    this.morto = true
+    this.sounds.stopMonstros()
+    this.sounds.stopPassaros()
     this.atualizaHud(this.energia, this.vida)
     document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
     document.querySelector('a#tentarNovamente').style.display = 'block'
-
-    this.camera.position.set(
-      this.jogadorPositionX,
-      THREE.MathUtils.lerp(this.camera.position.y, 0, 0.1),
-      this.jogadorPositionZ
-    );
 
     // Remover eventos corretamente
     document.removeEventListener('keydown', this.teclaPressionadaHandler, false)
     document.removeEventListener('keyup', this.teclaSoltaHandler, false)
     document.removeEventListener('mousemove', this.movimentoMouseHandler, false)
-}
+  }
 
   update() {
 
@@ -215,7 +217,9 @@ export default class jogador {
     this.colisaoChao()
 
     this.movimentoAgachar()
-
+    if (this.morto) {
+      this.jogadorPositionY = THREE.MathUtils.lerp(this.jogadorPositionY, 0, 0.05)
+    }
     if (this.vida <= 0) {
       this.fimJogo()
     } else {
@@ -244,6 +248,7 @@ export default class jogador {
     }
 
     this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
+    // console.log(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     this.atualizaHud(this.energia, this.vida)
   }
 }

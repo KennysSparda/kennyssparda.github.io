@@ -13,6 +13,7 @@ export default class Agua {
   adicionarAgua() {
     this.videoAgua = document.createElement("video")
     this.videoAgua.src = assets.aguaTextura 
+    this.videoAgua.playbackRate = 0.6
     this.videoAgua.loop = true
     this.videoAgua.muted = true
 

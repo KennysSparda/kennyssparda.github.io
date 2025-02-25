@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export default class Passaros {
-  constructor(mapa, quantidadeBandos = 10) {
+  constructor(mapa, quantidadeBandos = 3) {
     this.mapa = mapa
     this.scene = mapa.scene
     this.meshes = []

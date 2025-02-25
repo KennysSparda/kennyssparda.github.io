@@ -73,7 +73,7 @@ export default class Ceu {
   
     let corNoite = new THREE.Color(0x000000);  // Preto total (meia-noite)
     let corAzulNoite = new THREE.Color(0x000000);  // Azul escuro antes do amanhecer
-    let corCrepusculo = new THREE.Color(0xff8c42); // Laranja do pôr/nascer do sol
+    let corCrepusculo = new THREE.Color(0xff00ff); // Laranja do pôr/nascer do sol
     let corDia = new THREE.Color(0x87CEFF);   // Azul celeste do meio-dia
   
     let corTopo, corHorizonte;

@@ -8,21 +8,22 @@ import posicoes from './posicoesPlantas.js'
 
 export default class Entidades {
   constructor(mapa) {
+    console.log("Criando instância de Entidades");
     this.mapa = mapa
     this.scene = mapa.scene
     this.passaros = null
     this.monstros = null
     this.peixes = new Peixes(this.mapa)
     
-    // Criando diferentes tipos de vegetação
-    
     this.arvores = new Plantas(this.mapa, assets.arvore01, 1, true, true)
-    if(this.arvores.modeloOriginal) {
-      this.adicionarPlantas()
-    }
+    this.plantasAdicionadas = false
   }
 
   gerenciarEntidades(horarioSol) {
+    if(this.arvores.modeloOriginal && !this.plantasAdicionadas) {
+      this.plantasAdicionadas = true 
+      this.adicionarPlantas()
+    }
     const solAltura = Math.sin(horarioSol)
     if (solAltura < 0) {
       if (!this.monstros) {

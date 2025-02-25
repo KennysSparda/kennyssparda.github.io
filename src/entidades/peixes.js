@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export default class Peixes {
-  constructor(mapa, quantidadeBandos = 10) {
+  constructor(mapa, quantidade = 1) {
     this.mapa = mapa
     this.scene = mapa.scene
     this.nivelMar = mapa.altura
@@ -11,11 +11,11 @@ export default class Peixes {
     this.mixer = []
     this.velocidadeRotacao = 0.5
     this.tempo = 0
-    this.quantidadeBandos = quantidadeBandos
+    this.quantidade = quantidade
 
     const loader = new GLTFLoader()
 
-    for (let i = 0; i < this.quantidadeBandos; i++) {
+    for (let i = 0; i < this.quantidade; i++) {
       loader.load(assets.peixe01, (gltf) => {
         const mesh = gltf.scene
 
