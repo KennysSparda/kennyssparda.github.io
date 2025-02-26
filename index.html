@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3d Map Game Engine</title>
   <style>
-    /* body { margin: 0; overflow: hidden; } */
+    body { margin: 0; overflow: hidden; background: black;}
+    #fimdejogo { margin: 0; text-align: center; color: red; font: 26px bold;}
     canvas { display: block; }
     #hud { 
       position: absolute;
@@ -13,6 +14,8 @@
       margin-top: 1%;
       width: 200px;
     }
+
+    #tentarNovamente {display: none; text-align: center; margin: auto; color: greenyellow; font: 20px bold;}
 
     label {
       color: purple;
@@ -44,7 +47,7 @@
       box-shadow: 0px 0px 5px 3px rgb(255, 0, 0);
     }
     #vidaElement progress::-webkit-progress-bar {
-      background-color: rgb(255, 100, 100);
+      background-color: rgb(0, 0, 0);
       border-radius: 10px;
     }
     #vidaElement progress::-webkit-progress-value {
@@ -54,14 +57,20 @@
   </style>
 </head>
 <body>
+  <div id="fimdejogo"></div>
+  <a id="tentarNovamente" href="/index.html">Tentar novamente</a>
   <div id="hud">
+    <div id="positionElement">
+      <label for="pos">Posicao</label>
+      <p id="pos"></p>
+    </div>
     <div id="energiaElement">
       <label for="energia">Energia</label>
-      <progress id="energia" max="5" value="3"></progress>
+      <progress id="energia" max="5" value="5"></progress>
     </div>
     <div id="vidaElement">
       <label for="vida">Vida</label>
-      <progress id="vida" max="3" value="3"></progress>
+      <progress id="vida" max="100" value="100"></progress>
     </div>
     <label for="log" id="log"></label>
   </div>

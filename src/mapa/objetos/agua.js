@@ -1,10 +1,11 @@
 import * as THREE from 'three'
 
 export default class Agua {
-  constructor(scene, tamanhoX, tamanhoZ, alturaAgua) {
+  constructor(scene, tamanhoX, tamanhoZ, multiplicadorTamanho, alturaAgua) {
     this.scene = scene
     this.tamanhoX = tamanhoX
     this.tamanhoZ = tamanhoZ
+    this.multiplicadorTamanho = multiplicadorTamanho
     this.alturaDaAgua = alturaAgua
     this.adicionarAgua()
   }
@@ -12,6 +13,7 @@ export default class Agua {
   adicionarAgua() {
     this.videoAgua = document.createElement("video")
     this.videoAgua.src = assets.aguaTextura 
+    this.videoAgua.playbackRate = 0.6
     this.videoAgua.loop = true
     this.videoAgua.muted = true
 
@@ -22,7 +24,7 @@ export default class Agua {
     this.texturaAgua.wrapT = THREE.RepeatWrapping
     this.texturaAgua.repeat.set(this.tamanhoX / 2, this.tamanhoZ / 2)
 
-    const geometriaAgua = new THREE.PlaneGeometry(this.tamanhoX, this.tamanhoZ)
+    const geometriaAgua = new THREE.PlaneGeometry(this.tamanhoX * this.multiplicadorTamanho, this.tamanhoZ * this.multiplicadorTamanho)
     const materialAgua = new THREE.MeshStandardMaterial({
       map: this.texturaAgua,
       transparent: true,

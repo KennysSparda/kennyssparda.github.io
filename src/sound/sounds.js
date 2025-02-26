@@ -1,28 +1,40 @@
 export default class Sound {
-  constructor(mapa, player) {
-    this.mapa = mapa
-    this.player = player
-    
-    this.monstros = null
+  constructor() {
+    this.monstrosSons = this.reprodutor(assets.monstrosSons, true)
     this.monstrosPlaying = false
-    this.passaros = assets.passaroSom
+
+    this.passarosSons = this.reprodutor(assets.passarosSons, true)
     this.passarosPlaying = false
   }
 
-  player(asset) {
-    const player = document.createElement('video')
-    player.src = asset
-    player.loop = true
-
-    const iniciarVideo = () => {
-      player.play().catch(e => console.warn("Falha ao iniciar vídeo:", e))
-      document.removeEventListener("click", iniciarVideo)
-    }
-    document.addEventListener("click", iniciarVideo)
+  reprodutor(asset, loop) {
+    const reprodutor = document.createElement('video')
+    reprodutor.src = asset
+    reprodutor.loop = loop
+    return reprodutor
   }
 
-  playPassaroSom() {
+  playMonstros() {
+    if(!this.monstrosPlaying) {
+      this.monstrosSons.play()
+    }
+    this.monstrosPlaying = true
+  }
+
+  playPassaros() {
+    if(!this.passarosPlaying) {
+      this.passarosSons.play()
+    }
     this.passarosPlaying = true
-    player(assets.passaroSom)
+  }
+
+  stopMonstros() {
+    this.monstrosSons.pause()
+    this.monstrosPlaying = false
+  }
+
+  stopPassaros() {
+    this.passarosSons.pause()
+    this.passarosPlaying = false
   }
 }
