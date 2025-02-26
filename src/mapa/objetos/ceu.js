@@ -11,12 +11,12 @@ export default class Ceu {
   carregarSkybox() {
     const loader = new THREE.CubeTextureLoader();
     const arquivos = [
-      '/assets/mapa/ceu/ceuDiurno.png', // direita
-      '/assets/mapa/ceu/ceuDiurno.png', // esquerda
-      '/assets/mapa/ceu/ceuDiurno.png', // cima
-      '/assets/mapa/ceu/ceuDiurno.png', // baixo
-      '/assets/mapa/ceu/ceuDiurno.png', // frente
-      '/assets/mapa/ceu/ceuDiurno.png'  // trás
+      assets.ceuDiurnoTextura, // direita
+      assets.ceuDiurnoTextura, // esquerda
+      assets.ceuDiurnoTextura, // cima
+      assets.ceuDiurnoTextura, // baixo
+      assets.ceuDiurnoTextura, // frente
+      assets.ceuDiurnoTextura  // trás
     ];
 
     const skyboxTexture = loader.load(arquivos, () => {

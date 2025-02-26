@@ -158,7 +158,9 @@ export default class Player {
         )
         if (distancia < 0.5) {
           this.vida-=this.mapa.criaturas.monstros.dano
-          document.querySelector('label#log').innerHTML += `-${this.mapa.criaturas.monstros.dano}`
+
+          console.log(`-${this.mapa.criaturas.monstros.dano}`)
+          
           document.body.style.backgroundColor = 'rgba(255, 0, 0, 0.5)' // Tela pisca vermelha
           setTimeout(() => document.body.style.backgroundColor = 'transparent', 200)
           this.atualizaHud(this.energia, this.vida)
