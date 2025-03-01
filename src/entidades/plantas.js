@@ -33,8 +33,6 @@ export default class Plantas {
           child.renderOrder = 1; // Objetos com menor valor são renderizados primeiro
         }
       });
-    
-      console.log("Modelo carregado, pode adicionar as plantas agora.");
     });
   }
 
@@ -69,7 +67,7 @@ export default class Plantas {
 
   verificarColisao() {
     const jogadorPos = this.renderizador.camera.position;
-    const raioColisao = 0.7; // Ajuste conforme necessário
+    const raioColisao = 1.0; // Ajuste conforme necessário
 
     this.meshes.forEach(planta => {
       const distancia = jogadorPos.distanceTo(planta.position);

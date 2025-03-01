@@ -1,11 +1,19 @@
-// gameController.js
 export default class GameController {
-  constructor(mundo, renderizador, sounds) {
+  constructor(mundo, renderizador, sounds, config) {
     this.mundo = mundo
     this.renderizador = renderizador
     this.sounds = sounds
     this.tempo = 0
     this.horarioSol = null
+
+    this.aplicarConfiguracoes(config)
+  }
+
+  aplicarConfiguracoes(config) {
+    // Aplicar as configurações ao jogo
+    // this.renderizador.atualizarQualidade(config)
+    // this.sounds.atualizarVolume(config.volumePrincipal, config.volumeMusica)
+    // this.mundo.atualizarRenderizacao(config.distanciaVisao, config.densidadeVegetacao)
   }
 
   atualizarRelogio() {

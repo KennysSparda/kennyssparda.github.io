@@ -45,7 +45,7 @@ export default class meshs {
 
   seguir(jogador) {
     this.meshes.forEach((mesh) => {
-      const posicaoJogador = new THREE.Vector3(jogador.jogadorPositionX, jogador.jogadorPositionY, jogador.jogadorPositionZ)
+      const posicaoJogador = new THREE.Vector3(jogador.posicao.x, jogador.posicao.y, jogador.posicao.z)
       const direcao = new THREE.Vector3()
       direcao.subVectors(posicaoJogador, mesh.position).normalize()
 

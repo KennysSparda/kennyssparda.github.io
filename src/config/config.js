@@ -1,15 +1,21 @@
 export default class Config {
   constructor() {
-    // Qualidade gráfica
-    this.distanciaVisao = 22000
-    this.habilitarSombras = true
-    this.qualidadeSombras = 1024
-    this.qualidadeTerreno = 1024
-    this.densidadeVegetacao = 10
+    // Carregar do localStorage ou definir valores padrões
+    const savedConfig = JSON.parse(localStorage.getItem("gameConfig")) || {}
 
-    // Audio
-    this.volumePrincipal = 100
-    this.volumeMusica = 100
+    this.distanciaVisao = savedConfig.distanciaVisao ?? 22000
+    this.distanciaNevoeiro = savedConfig.distanciaNevoeiro ?? 50000
+    this.habilitarSombras = savedConfig.habilitarSombras ?? true
+    this.qualidadeSombras = savedConfig.qualidadeSombras ?? 1024
+    this.qualidadeTerreno = savedConfig.qualidadeTerreno ?? 1024
+    this.densidadeVegetacao = savedConfig.densidadeVegetacao ?? 10
+
+    this.volumePrincipal = savedConfig.volumePrincipal ?? 100
+    this.volumeMusica = savedConfig.volumeMusica ?? 100
+  }
+
+  salvarConfiguracao() {
+    localStorage.setItem("gameConfig", JSON.stringify(this))
   }
 
   definirConfiguracao(distanciaVisao, habilitarSombras, qualidadeSombras, qualidadeTerreno, densidadeVegetacao, volumePrincipal, volumeMusica) {
@@ -20,6 +26,7 @@ export default class Config {
     this.densidadeVegetacao = densidadeVegetacao
     this.volumePrincipal = volumePrincipal
     this.volumeMusica = volumeMusica
+
+    this.salvarConfiguracao()
   }
 }
-

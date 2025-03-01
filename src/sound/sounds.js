@@ -1,16 +1,18 @@
 export default class Sound {
-  constructor() {
+  constructor(config) {
     this.monstrosSons = this.reprodutor(assets.monstrosSons, true)
     this.monstrosPlaying = false
 
     this.passarosSons = this.reprodutor(assets.passarosSons, true)
     this.passarosPlaying = false
+    this.volume = config.volumePrincipal
   }
 
   reprodutor(asset, loop) {
     const reprodutor = document.createElement('video')
     reprodutor.src = asset
     reprodutor.loop = loop
+    reprodutor.volume = this.volume != undefined ? this.volume : 0.1;
     return reprodutor
   }
 

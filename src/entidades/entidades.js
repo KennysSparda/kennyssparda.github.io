@@ -21,7 +21,6 @@ const posicoes = [
 
 export default class Entidades {
   constructor(mundo) {
-    console.log("Criando instância de Entidades");
     this.mundo = mundo
     this.scene = mundo.scene
     this.passaros = null

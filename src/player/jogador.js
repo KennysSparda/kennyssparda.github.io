@@ -219,6 +219,24 @@ export default class Jogador {
     document.querySelector('#pos').textContent = `X: ${this.posicao.x.toFixed(2)}, Y: ${this.posicao.y.toFixed(2)}, Z: ${this.posicao.z.toFixed(2)}`;
   }
 
+  fimJogo() {
+    this.energia = 0
+    this.energiaMax = 0
+    this.regeneracaoVida = 0
+    this.morto = true
+    this.sounds.stopMonstros()
+    this.sounds.stopPassaros()
+    this.atualizaHud(this.energia, this.vida)
+    document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
+    document.querySelector('.hidden').style.display = 'block'
+    document.querySelector('.hidden').style.visibility = 'visible'
+
+    // Remover eventos corretamente
+    document.removeEventListener('keydown', this.teclaPressionadaHandler, false)
+    document.removeEventListener('keyup', this.teclaSoltaHandler, false)
+    document.removeEventListener('mousemove', this.movimentoMouseHandler, false)
+  }
+
   aplicaDanos() {
     if (this.morto) {
       this.posicao.y = THREE.MathUtils.lerp(this.posicao.y, 0, 0.05);

@@ -7,23 +7,49 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="fimdejogo"></div>
-  <a id="tentarNovamente" href="/index.html">Tentar novamente</a>
+  <div id="fimdejogo" class="hidden">Game Over</div>
+  
   <div id="hud">
+    <div id="status">
+      <div id="vidaElement">
+        <label for="vida">Vida</label>
+        <progress id="vida" max="100" value="100"></progress>
+      </div>
+      <div id="energiaElement">
+        <label for="energia">Energia</label>
+        <progress id="energia" max="5" value="5"></progress>
+      </div>
+    </div>
     <div id="positionElement">
-      <label for="pos">Posicao</label>
+      <label for="pos">Posição</label>
       <p id="pos"></p>
     </div>
-    <div id="energiaElement">
-      <label for="energia">Energia</label>
-      <progress id="energia" max="5" value="5"></progress>
-    </div>
-    <div id="vidaElement">
-      <label for="vida">Vida</label>
-      <progress id="vida" max="100" value="100"></progress>
-    </div>
-    <label for="log" id="log"></label>
+    <div id="log"></div>
   </div>
+
+  <div id="menuConfig">
+    <h2>Configurações</h2>
+    <label>Distância de Visão</label>
+    <input type="range" id="distanciaVisao" min="5000" max="50000" step="500" />
+    
+    <label>Qualidade das Sombras</label>
+    <select id="qualidadeSombras">
+      <option value="512">Baixa</option>
+      <option value="1024" selected>Média</option>
+      <option value="2048">Alta</option>
+    </select>
+  
+    <label>Volume Principal</label>
+    <input type="range" id="volumePrincipal" min="0" max="100" />
+  
+    <label>Volume da Música</label>
+    <input type="range" id="volumeMusica" min="0" max="100" />
+  
+    <button id="salvarConfig">Salvar</button>
+    <button id="fecharConfig">Fechar</button>
+  </div>
+  <button id="abrirConfig">⚙ Configurações</button>
+  <a id="tentarNovamente" href="/index.html" class="hidden">Tentar novamente</a>
 
   <script type="importmap">
     {
@@ -34,12 +60,7 @@
       }
     }
   </script>
-
-  <script type="module">
-
-  </script>
   <script src="./src/etc/assets.js"></script>
-  <script type="module" src="main.js"></script>
-  
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>
