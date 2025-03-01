@@ -4,62 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3d Map Game Engine</title>
-  <style>
-    body { margin: 0; overflow: hidden; background: black;}
-    #fimdejogo { margin: 0; text-align: center; color: red; font: 26px bold;}
-    canvas { display: block; }
-    #hud { 
-      position: absolute;
-      margin-left: 2%;
-      margin-top: 1%;
-      width: 200px;
-    }
-
-    #tentarNovamente {display: none; text-align: center; margin: auto; color: greenyellow; font: 20px bold;}
-
-    label {
-      color: purple;
-      font: 13px bold;
-      font-family: monospace;
-    }
-
-    #pos {
-      color: white;
-      text-shadow: 0 0 5px black;
-    }
-
-    #energiaElement progress {
-      border-radius: 10px; 
-      width: 100%;
-      height: 5px;
-
-      box-shadow: 0px 0px 5px 3px rgb(0, 255, 0);
-    }
-    #energiaElement progress::-webkit-progress-bar {
-      background-color: rgb(100, 255, 100);
-      border-radius: 10px;
-    }
-    #energiaElement progress::-webkit-progress-value {
-      background-color: rgb(255, 255, 255);
-      border-radius: 10px;
-    }
-
-    #vidaElement progress {
-      border-radius: 10px; 
-      width: 100%;
-      height: 5px;
-
-      box-shadow: 0px 0px 5px 3px rgb(255, 0, 0);
-    }
-    #vidaElement progress::-webkit-progress-bar {
-      background-color: rgb(0, 0, 0);
-      border-radius: 10px;
-    }
-    #vidaElement progress::-webkit-progress-value {
-      background-color: rgb(255, 255, 255);
-      border-radius: 10px;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div id="fimdejogo"></div>
@@ -80,10 +25,19 @@
     <label for="log" id="log"></label>
   </div>
 
-  <script type="importmap">{"imports": {
+  <script type="importmap">
+    {
+      "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.149.0/examples/jsm/"}}</script>
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.149.0/examples/jsm/",
+        "rapier":     "https://cdn.skypack.dev/@dimforge/rapier3d"
+      }
+    }
+  </script>
 
+  <script type="module">
+
+  </script>
   <script src="./src/etc/assets.js"></script>
   <script type="module" src="main.js"></script>
   

@@ -2,10 +2,10 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export default class Plantas {
-  constructor(mapa, modelo, escala = 1, animacao = true, loop) {
-    this.mapa = mapa;
-    this.scene = mapa.scene;
-    this.renderizador = mapa.renderizador
+  constructor(mundo, modelo, escala = 1, animacao = true, loop) {
+    this.mundo = mundo;
+    this.scene = mundo.scene;
+    this.renderizador = mundo.renderizador
     this.modelo = modelo;
     this.escala = escala;
     this.animacao = animacao;

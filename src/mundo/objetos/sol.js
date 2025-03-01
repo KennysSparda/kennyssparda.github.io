@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 
 export default class Sol {
-  constructor(scene, tamanhoMapa, tamanhoSol, raioOrbita) {
+  constructor(scene, tamanhomundo, tamanhoSol, raioOrbita) {
     this.scene = scene
-    this.tamanhoMapa = tamanhoMapa
+    this.tamanhomundo = tamanhomundo
     this.tamanho = tamanhoSol
     this.raio = raioOrbita
     this.criarSol()
@@ -19,11 +19,11 @@ export default class Sol {
     this.luzSol.shadow.mapSize.width = 4096; // Aumenta a resolução das sombras
     this.luzSol.shadow.mapSize.height = 4096;
     this.luzSol.shadow.camera.near = 0.1; // Distância mínima pra considerar sombras
-    this.luzSol.shadow.camera.far = this.raio * 2; // Ajusta conforme o tamanho do mapa
-    this.luzSol.shadow.camera.left = -this.tamanhoMapa * 2;
-    this.luzSol.shadow.camera.right = this.tamanhoMapa * 2;
-    this.luzSol.shadow.camera.top = this.tamanhoMapa * 2;
-    this.luzSol.shadow.camera.bottom = -this.tamanhoMapa * 2;
+    this.luzSol.shadow.camera.far = this.raio * 2; // Ajusta conforme o tamanho do mundo
+    this.luzSol.shadow.camera.left = -this.tamanhomundo * 2;
+    this.luzSol.shadow.camera.right = this.tamanhomundo * 2;
+    this.luzSol.shadow.camera.top = this.tamanhomundo * 2;
+    this.luzSol.shadow.camera.bottom = -this.tamanhomundo * 2;
 
     this.scene.add(this.sol, this.luzSol)
     // const lightHelper = new THREE.DirectionalLightHelper(this.luzSol, 10);

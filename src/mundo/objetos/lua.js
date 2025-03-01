@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 
 export default class Lua {
-  constructor(scene, tamanhoMapa, tamanhoLua, raioOrbita) {
+  constructor(scene, tamanhomundo, tamanhoLua, raioOrbita) {
     this.scene = scene
-    this.tamanhoMapa = tamanhoMapa
+    this.tamanhomundo = tamanhomundo
     this.tamanho = tamanhoLua
     this.segmentos = 200
     this.raio = raioOrbita

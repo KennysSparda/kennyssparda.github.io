@@ -2,11 +2,11 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export default class Peixes {
-  constructor(mapa, quantidade = 1) {
-    this.mapa = mapa
-    this.scene = mapa.scene
-    this.nivelMar = mapa.altura
-    this.alturaDaAgua = mapa.alturaDaAgua
+  constructor(mundo, quantidade = 1) {
+    this.mundo = mundo
+    this.scene = mundo.scene
+    this.nivelMar = mundo.altura
+    this.alturaDaAgua = mundo.alturaDaAgua
     this.meshes = []
     this.mixer = []
     this.velocidadeRotacao = 0.5
@@ -20,9 +20,9 @@ export default class Peixes {
         const mesh = gltf.scene
 
         mesh.scale.set(0.2, 0.2, 0.2)
-        const raioMapa = mapa.tamanho / 2
-        const centroX = (Math.random() - 0.5) * raioMapa * 2
-        const centroZ = (Math.random() - 0.5) * raioMapa * 2
+        const raiomundo = mundo.tamanho / 2
+        const centroX = (Math.random() - 0.5) * raiomundo * 2
+        const centroZ = (Math.random() - 0.5) * raiomundo * 2
         mesh.userData.centro = new THREE.Vector3(centroX, Math.random() * 5 + 5, centroZ)
         mesh.userData.raio = Math.random() * 3 + 5 
         mesh.position.set(

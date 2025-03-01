@@ -2,19 +2,19 @@
 const assets = {
 
   // Terreno
-  terrenoTextura: '/assets/mapa/terreno/terreno.png',
-  terrenoTopografia: '/assets/mapa/terreno/terrenoTopografia.png',
+  terrenoTextura: '/assets/mundo/terreno/terreno.png',
+  terrenoTopografia: '/assets/mundo/terreno/terrenoTopografia.png',
 
   // Ceu
-  ceuDiurnoTextura: '/assets/mapa/ceu/ceuDiurno.png',
-  ceuNoturnoTextura: '/assets/mapa/ceu/ceuNoturno.png',
+  ceuDiurnoTextura: '/assets/mundo/ceu/ceuDiurno.png',
+  ceuNoturnoTextura: '/assets/mundo/ceu/ceuNoturno.png',
 
   // Agua
-  aguaTextura: '/assets/mapa/agua/agua.mp4',
+  aguaTextura: '/assets/mundo/agua/agua.mp4',
 
   // Lua
-  luaTextura: '/assets/mapa/lua/lua.jpg',
-  luaTopografia: '/assets/mapa/lua/luaTopografia.jpg',
+  luaTextura: '/assets/mundo/lua/lua.jpg',
+  luaTopografia: '/assets/mundo/lua/luaTopografia.jpg',
 
   // entidades moveis
   passaros: '/assets/entidades/passaros/scene.gltf',

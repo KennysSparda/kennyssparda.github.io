@@ -7,7 +7,7 @@ import Lua from './objetos/lua.js'
 import Agua from './objetos/agua.js'
 import Entidades from '../entidades/entidades.js'
 
-export default class Mapa {
+export default class Mundo {
   constructor(renderizador) {
     this.renderizador = renderizador
     this.scene = renderizador.scene

@@ -39,12 +39,12 @@ export default class Terreno {
             this.terreno.name = "terreno" 
             this.scene.add(this.terreno)
 
-            this.alturas = this.processarMapa()
+            this.alturas = this.processarmundo()
         })
     })
   }
 
-  processarMapa() {
+  processarmundo() {
     if (!this.displacementMap || !this.displacementMap.image) {
       return 0
     }

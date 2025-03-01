@@ -20,15 +20,15 @@ const posicoes = [
 ];
 
 export default class Entidades {
-  constructor(mapa) {
+  constructor(mundo) {
     console.log("Criando instância de Entidades");
-    this.mapa = mapa
-    this.scene = mapa.scene
+    this.mundo = mundo
+    this.scene = mundo.scene
     this.passaros = null
     this.monstros = null
-    this.peixes = new Peixes(this.mapa)
+    this.peixes = new Peixes(this.mundo)
     
-    this.arvores = new Plantas(this.mapa, assets.arvore01, 1, true, true)
+    this.arvores = new Plantas(this.mundo, assets.arvore01, 1, true, true)
     this.plantasAdicionadas = false
   }
 
@@ -45,7 +45,7 @@ export default class Entidades {
     const solAltura = Math.sin(horarioSol)
     if (solAltura < 0) {
       if (!this.monstros) {
-        this.monstros = new Monstros(this.mapa)
+        this.monstros = new Monstros(this.mundo)
       }
       if(this.passaros) {
         this.passaros.meshes.forEach(mesh => this.scene.remove(mesh))
@@ -54,7 +54,7 @@ export default class Entidades {
     }
     if (solAltura > 0) {
       if (!this.passaros) {
-        this.passaros = new Passaros(this.mapa)
+        this.passaros = new Passaros(this.mundo)
       }
       if (this.monstros) {
         this.monstros.meshes.forEach(mesh => this.scene.remove(mesh))

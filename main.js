@@ -1,4 +1,4 @@
-import Mapa from './src/mapa/mapa.js'
+import Mundo from './src/mundo/mundo.js'
 import Renderizador from './src/render/renderizador.js'
 import GameController from './src/game/gameController.js'
 import Jogador from './src/player/jogador.js'
@@ -13,22 +13,22 @@ const config = new Config()
 // Criar os módulos principais
 const sounds = new Sound()
 const renderizador = new Renderizador(config)
-const mapa = new Mapa(renderizador) // Passamos a cena do Renderizador
-const gameController = new GameController(mapa, renderizador, sounds)
-const jogador = new Jogador(renderizador, mapa, mapa.terreno, sounds)
+const mundo = new Mundo(renderizador) // Passamos a cena do Renderizador
+const gameController = new GameController(mundo, renderizador, sounds)
+const jogador = new Jogador(renderizador, mundo, mundo.terreno, sounds)
 
 function animate() {
   requestAnimationFrame(animate)
 
-  if (mapa.terreno.terreno) {
+  if (mundo.terreno.terreno) {
     jogador.update()
     gameController.atualizar(jogador) // Agora o GameController gerencia tudo
 
     const deltaTime = clock.getDelta()
-    if (mapa.entidades.passaros) mapa.entidades.passaros.update(deltaTime)
-    if (mapa.entidades.monstros) mapa.entidades.monstros.update(deltaTime)
-    if (mapa.entidades.peixes) mapa.entidades.peixes.update(deltaTime)
-    if (mapa.entidades.arvores) mapa.entidades.arvores.update(deltaTime)
+    if (mundo.entidades.passaros) mundo.entidades.passaros.update(deltaTime)
+    if (mundo.entidades.monstros) mundo.entidades.monstros.update(deltaTime)
+    if (mundo.entidades.peixes) mundo.entidades.peixes.update(deltaTime)
+    if (mundo.entidades.arvores) mundo.entidades.arvores.update(deltaTime)
 
   } else {
     console.warn('Aguardando terreno.mesh estar disponível...');

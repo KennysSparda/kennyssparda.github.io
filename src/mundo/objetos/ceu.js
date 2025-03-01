@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
 export default class Ceu {
-  constructor(scene, tamanhoMapa, multiplicadorTamanho) {
+  constructor(scene, tamanhomundo, multiplicadorTamanho) {
     this.scene = scene;
-    this.tamanhoMapa = tamanhoMapa;
+    this.tamanhomundo = tamanhomundo;
     this.multiplicadorTamanho = multiplicadorTamanho;
     this.ceuTexture = null;
 
@@ -30,9 +30,9 @@ export default class Ceu {
   checkTexturesLoaded() {
     if (this.ceuNoturnoTextura && this.ceuDiurnoTextura) {
       const geometria = new THREE.BoxGeometry(
-        this.tamanhoMapa * this.multiplicadorTamanho,
-        this.tamanhoMapa * this.multiplicadorTamanho,
-        this.tamanhoMapa * this.multiplicadorTamanho
+        this.tamanhomundo * this.multiplicadorTamanho,
+        this.tamanhomundo * this.multiplicadorTamanho,
+        this.tamanhomundo * this.multiplicadorTamanho
       );
       this.materialEstrelas = new THREE.MeshBasicMaterial({
         map: this.ceuNoturnoTextura,
@@ -112,7 +112,7 @@ export default class Ceu {
 
   carregarSkybox() {
     const geometria = new THREE.SphereGeometry(
-      this.tamanhoMapa * this.multiplicadorTamanho,
+      this.tamanhomundo * this.multiplicadorTamanho,
       32,
       32
     );
