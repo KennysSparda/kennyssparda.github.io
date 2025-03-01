@@ -2,11 +2,12 @@ import Passaros from '../entidades/passaros.js'
 import { THREE } from '../etc/imports.js'
 
 export default class jogador {
-  constructor(mapa, terreno, sounds) {
+  constructor(render, mapa, terreno, sounds) {
+    this.renderizador = render
     this.mapa = mapa
     this.terreno = terreno
     this.sounds = sounds
-    this.camera = this.mapa.camera
+    this.camera = this.renderizador.camera
     this.scene = this.mapa.scene
     this.sensibilidadeMouse = 0.001
     this.movimentos = { frente: false, tras: false, esquerda: false, direita: false, pulando: false, agachando: false, correndo: false}
@@ -27,7 +28,7 @@ export default class jogador {
     this.jogadorPositionZ = 0
     this.jogadorPositionY = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ) + this.alturaJogador
     
-    this.limiteSubida = 1
+    this.limiteSubida = 0.4
     
     this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
     
@@ -44,8 +45,6 @@ export default class jogador {
     this.regeneracaoVida=0.01
 
     // Eventos de entrada
-    this.mapa.renderer.domElement.addEventListener('click', () => mapa.renderer.domElement.requestPointerLock())
-
     this.teclaPressionadaHandler = this.teclaPressionada.bind(this)
     this.teclaSoltaHandler = this.teclaSolta.bind(this)
     this.movimentoMouseHandler = this.movimentoMouse.bind(this)
@@ -53,7 +52,7 @@ export default class jogador {
     document.addEventListener('keydown', this.teclaPressionadaHandler, false)
     document.addEventListener('keyup', this.teclaSoltaHandler, false)
     document.addEventListener('mousemove', this.movimentoMouseHandler, false)
-    this.mapa.renderer.domElement.addEventListener('click', () => this.mapa.renderer.domElement.requestPointerLock())
+    this.renderizador.renderer.domElement.addEventListener('click', () => this.renderizador.renderer.domElement.requestPointerLock())
 
 
     // Ajuste da hud
@@ -110,6 +109,7 @@ export default class jogador {
   colisaoChao() {
     const alturaTerreno = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ)
     if (this.jogadorPositionY <= alturaTerreno + this.alturaJogador) {
+        // 
         this.jogadorPositionY = alturaTerreno + this.alturaJogador
         this.velocidadeY = 0
         this.movimentos.pulando = false
@@ -140,43 +140,85 @@ export default class jogador {
   }
 
   atualizarPosition() {
-    // Calcula a direção de movimento horizontal
-    const direcao = new THREE.Vector3();
-    this.camera.getWorldDirection(direcao);
-    direcao.y = 0;
-    direcao.normalize();
+    // Atualiza o movimento horizontal
+    const nextPos = this.calculateNextHorizontalPosition();
+    const terrainHeightNext = this.terreno.obterAlturaTerreno(nextPos.x, nextPos.z);
+    const currentTerrainHeight = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ);
+    const heightDiff = Math.abs(terrainHeightNext - currentTerrainHeight);
   
-    const direita = new THREE.Vector3().crossVectors(this.camera.up, direcao).normalize();
-  
-    // Calcula a próxima posição com base no input
-    const proximaPosicao = this.camera.position.clone();
-    if (this.movimentos.frente) proximaPosicao.addScaledVector(direcao, this.velocidadeAtual);
-    if (this.movimentos.tras) proximaPosicao.addScaledVector(direcao, -this.velocidadeAtual);
-    if (this.movimentos.esquerda) proximaPosicao.addScaledVector(direita, this.velocidadeAtual);
-    if (this.movimentos.direita) proximaPosicao.addScaledVector(direita, -this.velocidadeAtual);
-  
-    // Usa Raycaster pra detectar a altura do terreno abaixo da nova posição
-    const rayOrigin = new THREE.Vector3(proximaPosicao.x, proximaPosicao.y + 10, proximaPosicao.z); // 10 unidades acima
-    const rayDirection = new THREE.Vector3(0, -1, 0); // apontando pra baixo
-    const raycaster = new THREE.Raycaster(rayOrigin, rayDirection);
-  
-    // Supondo que o terreno esteja armazenado em this.terreno.mesh
-    const intersects = raycaster.intersectObject(this.terreno.terreno);
-    if (intersects.length > 0) {
-      const groundHeight = intersects[0].point.y;
-      const alturaAtual = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ);
-      const diferencaAltura = Math.abs(groundHeight - alturaAtual);
-  
-      // Se a subida/descida for suave, atualiza a posição
-      if (diferencaAltura <= this.limiteSubida || this.movimentos.pulando) {
-        this.jogadorPositionX = proximaPosicao.x;
-        this.jogadorPositionZ = proximaPosicao.z;
-        // Se não estiver pulando, ajusta a posição vertical para ficar na altura correta
-        if (!this.movimentos.pulando) {
-          this.jogadorPositionY = groundHeight + this.alturaJogador;
-        }
+    if (this.canMoveHorizontally(heightDiff, terrainHeightNext)) {
+      this.jogadorPositionX = nextPos.x;
+      this.jogadorPositionZ = nextPos.z;
+      
+      if (!this.movimentos.pulando) {
+        this.adjustVerticalPosition(terrainHeightNext);
       }
+    } else {
+      
     }
+  
+    // Aplica a lógica de queda livre (movimento vertical)
+    this.applyFreeFall();
+  
+    // Atualiza a posição da câmera
+    this.updateCameraPosition();
+  
+    
+  }
+  
+  calculateNextHorizontalPosition() {
+    const direction = new THREE.Vector3();
+    this.camera.getWorldDirection(direction);
+    direction.y = 0;
+    direction.normalize();
+  
+    const right = new THREE.Vector3().crossVectors(this.camera.up, direction).normalize();
+    const nextPos = this.camera.position.clone();
+  
+    if (this.movimentos.frente) nextPos.addScaledVector(direction, this.velocidadeAtual);
+    if (this.movimentos.tras) nextPos.addScaledVector(direction, -this.velocidadeAtual);
+    if (this.movimentos.esquerda) nextPos.addScaledVector(right, this.velocidadeAtual);
+    if (this.movimentos.direita) nextPos.addScaledVector(right, -this.velocidadeAtual);
+  
+    
+    return nextPos;
+  }
+  
+  canMoveHorizontally(heightDiff, terrainHeightNext) {
+    // Permite se a diferença for menor que o limite ou se estiver pulando e o player já estiver acima do terreno adiante
+    return heightDiff <= this.limiteSubida || (this.movimentos.pulando && this.camera.position.y >= terrainHeightNext);
+  }
+  
+  adjustVerticalPosition(terrainHeightNext) {
+    // Se o terreno à frente estiver mais alto (dentro do limite), sobe; se estiver mais baixo, desce.
+    if (terrainHeightNext > this.jogadorPositionY && Math.abs(terrainHeightNext - this.jogadorPositionY) <= this.limiteSubida) {
+      
+      this.jogadorPositionY = terrainHeightNext + this.alturaJogador;
+    } else if (terrainHeightNext < this.jogadorPositionY) {
+      
+      this.jogadorPositionY = terrainHeightNext + this.alturaJogador;
+    }
+  }
+  
+  applyFreeFall() {
+    const currentTerrainHeight = this.terreno.obterAlturaTerreno(this.jogadorPositionX, this.jogadorPositionZ);
+    if (!this.movimentos.pulando && this.jogadorPositionY > currentTerrainHeight + this.alturaJogador) {
+      
+      this.velocidadeQueda += this.gravidade; // Acelera a queda
+      this.jogadorPositionY -= this.velocidadeQueda;
+      
+      // Se ultrapassar o solo, corrige a posição
+      if (this.jogadorPositionY < currentTerrainHeight + this.alturaJogador) {
+        this.jogadorPositionY = currentTerrainHeight + this.alturaJogador;
+        this.velocidadeQueda = 0;
+      }
+    } else {
+      this.velocidadeQueda = 0;
+    }
+  }
+  
+  updateCameraPosition() {
+    this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ);
   }
   
   movimentoAgachar() {
@@ -189,34 +231,7 @@ export default class jogador {
     }
   }
 
-  fimJogo() {
-    this.energia = 0
-    this.energiaMax = 0
-    this.regeneracaoVida = 0
-    this.morto = true
-    this.sounds.stopMonstros()
-    this.sounds.stopPassaros()
-    this.atualizaHud(this.energia, this.vida)
-    document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
-    document.querySelector('a#tentarNovamente').style.display = 'block'
-
-    // Remover eventos corretamente
-    document.removeEventListener('keydown', this.teclaPressionadaHandler, false)
-    document.removeEventListener('keyup', this.teclaSoltaHandler, false)
-    document.removeEventListener('mousemove', this.movimentoMouseHandler, false)
-  }
-
-  update() {
-
-    this.atualizarCorrida() 
-  
-    this.atualizarPosition()
-
-    this.adicionarGravidade()
-  
-    this.colisaoChao()
-
-    this.movimentoAgachar()
+  aplicaDanos() {
     if (this.morto) {
       this.jogadorPositionY = THREE.MathUtils.lerp(this.jogadorPositionY, 0, 0.05)
     }
@@ -242,13 +257,49 @@ export default class jogador {
         })
       }
     }
-    
+  }
+
+  fimJogo() {
+    this.energia = 0
+    this.energiaMax = 0
+    this.regeneracaoVida = 0
+    this.morto = true
+    this.sounds.stopMonstros()
+    this.sounds.stopPassaros()
+    this.atualizaHud(this.energia, this.vida)
+    document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
+    document.querySelector('a#tentarNovamente').style.display = 'block'
+
+    // Remover eventos corretamente
+    document.removeEventListener('keydown', this.teclaPressionadaHandler, false)
+    document.removeEventListener('keyup', this.teclaSoltaHandler, false)
+    document.removeEventListener('mousemove', this.movimentoMouseHandler, false)
+  }
+
+  adicionarRegeneracaoDeVida() {
     if (this.vida < this.vidaMax) {
       this.vida+=this.regeneracaoVida
     }
+  }
+
+  update() {
+
+    this.atualizarCorrida() 
+    
+    this.adicionarGravidade()
+    
+    this.atualizarPosition()
+  
+    this.colisaoChao()
+
+    this.movimentoAgachar()
+
+    this.aplicaDanos()
+    
+    this.adicionarRegeneracaoDeVida()
 
     this.camera.position.set(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
-    // console.log(this.jogadorPositionX, this.jogadorPositionY, this.jogadorPositionZ)
+    
     this.atualizaHud(this.energia, this.vida)
   }
 }

@@ -2,9 +2,22 @@ import Monstros from './monstros.js'
 import Passaros from './passaros.js'
 import Peixes from './peixes.js'
 import Plantas from './plantas.js'
-import posicoes from './posicoesPlantas.js'
 
-
+const posicoes = [
+  { x: -3.6, y: 0.43, z: -0.6 },
+  { x: -1.6, y: 0.43, z: 0 },
+  { x: -1.05, y: 0.43, z: -1 },
+  { x: -1.64, y: 0.43, z: -1.8 },
+  { x: -1.45, y: 0.43, z: 0.8 },
+  { x: 0.4, y: 0.43, z: -1.5 },
+  { x: 0, y: 0.43, z: 1 },
+  { x: 2, y: 0.43, z: -2 },
+  { x: 3, y: 0.43, z: 0 },
+  { x: 3.12, y: 0.43, z: -1 },
+  { x: 3.3, y: 0.43, z: 2.4 },
+  { x: 4.8, y: 0.43, z: -1 },
+  { x: 5.2, y: 0.43, z: 1 },
+];
 
 export default class Entidades {
   constructor(mapa) {
@@ -19,7 +32,12 @@ export default class Entidades {
     this.plantasAdicionadas = false
   }
 
-  gerenciarEntidades(horarioSol) {
+  gerenciarEntidades(horarioSol, jogador) {
+    
+    if (this.monstros) {
+      this.monstros.seguir(jogador)
+    }
+
     if(this.arvores.modeloOriginal && !this.plantasAdicionadas) {
       this.plantasAdicionadas = true 
       this.adicionarPlantas()

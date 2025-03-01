@@ -28,7 +28,7 @@ export default class Agua {
     const materialAgua = new THREE.MeshStandardMaterial({
       map: this.texturaAgua,
       transparent: true,
-      opacity: 0.8,
+      opacity: 1,
       roughness: 0.4,
       metalness: 0.6
     })

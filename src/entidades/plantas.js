@@ -5,6 +5,7 @@ export default class Plantas {
   constructor(mapa, modelo, escala = 1, animacao = true, loop) {
     this.mapa = mapa;
     this.scene = mapa.scene;
+    this.renderizador = mapa.renderizador
     this.modelo = modelo;
     this.escala = escala;
     this.animacao = animacao;
@@ -67,7 +68,7 @@ export default class Plantas {
   }
 
   verificarColisao() {
-    const jogadorPos = this.mapa.camera.position;
+    const jogadorPos = this.renderizador.camera.position;
     const raioColisao = 0.7; // Ajuste conforme necessário
 
     this.meshes.forEach(planta => {
