@@ -33,8 +33,6 @@ export default class MenuConfig {
     this.inputs.habilitarSombras.checked = this.config.habilitarSombras
   }
 
-
-
   adicionarEventos() {
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
@@ -49,7 +47,7 @@ export default class MenuConfig {
       this.config.qualidadeTerreno = novoNivelDetalhes
       this.gameController.mundo.atualizarQualidadeTerreno(novoNivelDetalhes)
     })
-    
+
     // Atualiza o volume em tempo real
     this.inputs.volumePrincipal.addEventListener("input", () => {
       this.config.volumePrincipal = parseInt(this.inputs.volumePrincipal.value)

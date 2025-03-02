@@ -1,4 +1,5 @@
 import { THREE } from '../etc/imports.js'
+import MobileControls from "../ui/mobileControls.js"
 
 export default class Jogador {
   constructor(renderizador, mundo, terreno, sounds) {
@@ -60,6 +61,29 @@ export default class Jogador {
     // Configura a HUD
     document.querySelector('#energia').max = this.energiaMax;
     document.querySelector('#vida').max = this.vidaMax;
+
+    if (this.isMobile()) {
+      document.getElementById("mobileControls").classList.remove("hidden")
+      this.mobileControls = new MobileControls(this)
+    }
+  }
+
+  isMobile() {
+    return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)
+  }
+
+  movimentoTouch(deltaX, deltaY) {
+    const eixoHorizontal = new THREE.Quaternion().setFromAxisAngle(
+      new THREE.Vector3(0, 1, 0),
+      -deltaX * this.sensibilidadeMouse * 2 // Multiplicado para maior precisão
+    );
+    const eixoVertical = new THREE.Quaternion().setFromAxisAngle(
+      new THREE.Vector3(1, 0, 0),
+      -deltaY * this.sensibilidadeMouse * 2
+    );
+  
+    this.camera.quaternion.premultiply(eixoHorizontal);
+    this.camera.quaternion.multiply(eixoVertical);
   }
 
   // Métodos de Input

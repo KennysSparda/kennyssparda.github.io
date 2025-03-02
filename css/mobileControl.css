@@ -1,0 +1,28 @@
+#mobileControls {
+  position: absolute;
+  bottom: 10%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.control-btn {
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+}
+
+.control-btn:active {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.hidden {
+  display: none;
+}
