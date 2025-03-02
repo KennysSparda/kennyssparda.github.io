@@ -42,8 +42,6 @@ export default class Sol {
       this.luzSol.shadow.map.dispose(); // Remove o mapa antigo
       this.luzSol.shadow.map = null;    // Evita referências antigas
     }
-  
-    console.log("Sombras atualizadas para qualidade:", qualidadeSombras);
   }
 
   atualizar(tempo) {

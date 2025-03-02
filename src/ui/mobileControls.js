@@ -1,6 +1,8 @@
 export default class MobileControls {
-  constructor(jogador) {
+  constructor(jogador, menuConfig) {
     this.jogador = jogador
+    this.menuConfig = menuConfig
+
     this.controles = {
       frente: document.getElementById("btnUp"),
       tras: document.getElementById("btnDown"),
@@ -8,10 +10,13 @@ export default class MobileControls {
       direita: document.getElementById("btnRight"),
       pular: document.getElementById("btnJump"),
       correr: document.getElementById("btnRun"),
+      menu: document.getElementById("btnMenu")
     }
 
     this.adicionarEventos()
   }
+
+
 
   adicionarEventos() {
     let touchStartX = 0
@@ -50,6 +55,8 @@ export default class MobileControls {
       }
     } else if (acao === "correr") {
       this.jogador.movimentos.correndo = true
+    } else if (acao === "menu") {
+      this.menuConfig.toggleMenu()
     } else {
       this.jogador.movimentos[acao] = true
     }

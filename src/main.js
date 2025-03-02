@@ -11,16 +11,27 @@ import { THREE } from './etc/imports.js'
 const clock = new THREE.Clock()
 const config = new Config()
 
+let jogoPausado = false;
+
 // Criar os módulos principais
 const sounds = new Sound(config)
 const renderizador = new Renderizador(config)
 const mundo = new Mundo(renderizador) // Passamos a cena do Renderizador
 const gameController = new GameController(mundo, renderizador, sounds, config)
-const menuConfig = new MenuConfig(gameController)
-const jogador = new Jogador(renderizador, mundo, mundo.terreno, sounds)
+const menuConfig = new MenuConfig(gameController, jogoPausado)
+const jogador = new Jogador(renderizador, mundo, mundo.terreno, sounds, menuConfig)
+
 
 function animate() {
   requestAnimationFrame(animate)
+
+  if(menuConfig.jogoPausado) {
+    document.getElementById("mobileControls").classList.add("hidden")  
+    if (menuConfig.jogoPausado) return; 
+  } else {
+    document.getElementById("mobileControls").classList.remove("hidden")
+  }
+
 
   if (mundo.terreno.terreno) {
     jogador.update()

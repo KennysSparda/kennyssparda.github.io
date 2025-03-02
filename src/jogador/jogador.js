@@ -2,11 +2,12 @@ import { THREE } from '../etc/imports.js'
 import MobileControls from "../ui/mobileControls.js"
 
 export default class Jogador {
-  constructor(renderizador, mundo, terreno, sounds) {
+  constructor(renderizador, mundo, terreno, sounds, menuConfig) {
     this.renderizador = renderizador;
     this.mundo = mundo;
     this.terreno = terreno;
     this.sounds = sounds;
+    this.menuConfig = menuConfig
 
     this.camera = this.renderizador.camera;
     this.scene = this.mundo.scene;
@@ -64,7 +65,7 @@ export default class Jogador {
 
     if (this.isMobile()) {
       document.getElementById("mobileControls").classList.remove("hidden")
-      this.mobileControls = new MobileControls(this)
+      this.mobileControls = new MobileControls(this, menuConfig)
     }
   }
 
@@ -240,7 +241,7 @@ export default class Jogador {
   atualizaHud() {
     document.querySelector('#energia').value = this.energia;
     document.querySelector('#vida').value = this.vida;
-    document.querySelector('#pos').textContent = `X: ${this.posicao.x.toFixed(2)}, Y: ${this.posicao.y.toFixed(2)}, Z: ${this.posicao.z.toFixed(2)}`;
+    // document.querySelector('#pos').textContent = `X: ${this.posicao.x.toFixed(2)}, Y: ${this.posicao.y.toFixed(2)}, Z: ${this.posicao.z.toFixed(2)}`;
   }
 
   fimJogo() {
