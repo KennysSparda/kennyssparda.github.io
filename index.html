@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3d Map Game Engine</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/menu.css">
 </head>
 <body>
   <div id="fimdejogo" class="hidden">Game Over</div>
@@ -29,15 +30,36 @@
 
   <div id="menuConfig">
     <h2>Configurações</h2>
+  
     <label>Distância de Visão</label>
-    <input type="range" id="distanciaVisao" min="5000" max="50000" step="500" />
-    
+    <input type="range" id="distanciaVisao" min="5000" max="100000" step="500" />
+  
+    <label>Distância da Névoa</label>
+    <input type="range" id="distanciaNevoeiro" min="5000" max="150000" step="500" />
+  
+    <label>Habilitar Sombras</label>
+    <input type="checkbox" id="habilitarSombras" checked />
+  
     <label>Qualidade das Sombras</label>
     <select id="qualidadeSombras">
+      <option value="256">Muito Baixa</option>
       <option value="512">Baixa</option>
       <option value="1024" selected>Média</option>
       <option value="2048">Alta</option>
+      <option value="4096">Muito Alta</option>
     </select>
+  
+    <label>Qualidade do Terreno</label>
+    <select id="qualidadeTerreno">
+      <option value="256">Muito Baixa</option>
+      <option value="512">Baixa</option>
+      <option value="1024" selected>Média</option>
+      <option value="2048">Alta</option>
+      <option value="4096">Muito Alta</option>
+    </select>
+
+    <label>Densidade da Vegetação</label>
+    <input type="range" id="densidadeVegetacao" min="1" max="50" step="1" />
   
     <label>Volume Principal</label>
     <input type="range" id="volumePrincipal" min="0" max="100" />
@@ -48,8 +70,8 @@
     <button id="salvarConfig">Salvar</button>
     <button id="fecharConfig">Fechar</button>
   </div>
-  <button id="abrirConfig">⚙ Configurações</button>
-  <a id="tentarNovamente" href="/index.html" class="hidden">Tentar novamente</a>
+
+  <!-- <a id="tentarNovamente" href="/index.html" class="hidden">Tentar novamente</a> -->
 
   <script type="importmap">
     {

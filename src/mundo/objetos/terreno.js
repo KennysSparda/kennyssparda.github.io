@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
 export default class Terreno {
-  constructor(scene, tamanhoX, tamanhoZ, nivelDetalhes = 100, alturaEscala) {
+  constructor(scene, tamanhoX, tamanhoZ, nivelDetalhes, alturaEscala) {
     this.scene = scene
     this.tamanhoX = tamanhoX
     this.tamanhoZ = tamanhoZ
@@ -43,6 +43,22 @@ export default class Terreno {
         })
     })
   }
+
+  atualizarTerreno(novoNivelDetalhes) {
+    // Remove o terreno antigo da cena
+    if (this.terreno) {
+      this.scene.remove(this.terreno)
+      this.terreno.geometry.dispose()
+      this.terreno.material.dispose()
+    }
+  
+    // Atualiza o nível de detalhes e recria o terreno
+    this.nivelDetalhes = novoNivelDetalhes
+    this.adicionarTerreno()
+  
+    console.log("Terreno atualizado para nível de detalhes:", novoNivelDetalhes)
+  }
+  
 
   processarmundo() {
     if (!this.displacementMap || !this.displacementMap.image) {

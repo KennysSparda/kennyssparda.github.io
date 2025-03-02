@@ -3,17 +3,16 @@ export default class GameController {
     this.mundo = mundo
     this.renderizador = renderizador
     this.sounds = sounds
+    this.config = config
     this.tempo = 0
     this.horarioSol = null
 
-    this.aplicarConfiguracoes(config)
+    this.aplicarConfiguracoes()
   }
 
-  aplicarConfiguracoes(config) {
-    // Aplicar as configurações ao jogo
-    // this.renderizador.atualizarQualidade(config)
-    // this.sounds.atualizarVolume(config.volumePrincipal, config.volumeMusica)
-    // this.mundo.atualizarRenderizacao(config.distanciaVisao, config.densidadeVegetacao)
+  aplicarConfiguracoes() {
+    this.sounds.atualizarVolume(this.config.volumePrincipal, this.config.volumeMusica)
+    this.mundo.sol.atualizarSombras(this.config.qualidadeSombras)
   }
 
   atualizarRelogio() {
@@ -32,6 +31,7 @@ export default class GameController {
   }
 
   atualizar(jogador) {
+    this.aplicarConfiguracoes()
     this.atualizarRelogio()
     this.mundo.sol.atualizar(this.tempo)
     this.mundo.lua.atualizar(this.tempo)

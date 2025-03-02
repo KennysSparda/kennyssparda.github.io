@@ -5,7 +5,9 @@ export default class Sound {
 
     this.passarosSons = this.reprodutor(assets.passarosSons, true)
     this.passarosPlaying = false
+    
     this.volume = config.volumePrincipal
+    this.atualizarVolume(config.volumePrincipal, config.volumeMusica)
   }
 
   reprodutor(asset, loop) {
@@ -14,6 +16,12 @@ export default class Sound {
     reprodutor.loop = loop
     reprodutor.volume = this.volume != undefined ? this.volume : 0.1;
     return reprodutor
+  }
+
+  atualizarVolume(volumePrincipal, volumeMusica) {
+    this.volume = volumePrincipal / 100
+    this.monstrosSons.volume = this.volume
+    this.passarosSons.volume = this.volume
   }
 
   playMonstros() {

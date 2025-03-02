@@ -4,6 +4,12 @@ body {
   font-family: Arial, sans-serif;
 }
 
+a {
+  margin: 0;
+  padding: 0;
+}
+
+
 #fimdejogo {
   position: fixed;
   top: 50%;
@@ -19,11 +25,12 @@ body {
 
 .hidden {
   display: none;
+  visibility: hidden;
 }
 
 #hud {
   position: absolute;
-  top: 10px;
+  top: 75%;
   left: 10px;
   background: rgba(0, 0, 0, 0.6);
   padding: 10px;

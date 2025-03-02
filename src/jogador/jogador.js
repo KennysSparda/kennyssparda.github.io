@@ -26,7 +26,7 @@ export default class Jogador {
     this.gravidade = -0.002;
     this.velocidadeQueda = 0; // Inicializando
     this.suavizacaoAgachamento = 0.05;
-    this.alturaAgachado = 0.2;
+    this.alturaAgachado = 0.3;
     this.alturaJogador = 0.5;
     this.posicao = new THREE.Vector3(0, 0, 0);
     this.posicao.y = this.terreno.obterAlturaTerreno(0, 0) + this.alturaJogador;
