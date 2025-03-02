@@ -1,3 +1,7 @@
+document.addEventListener("dblclick", (event) => {
+  event.preventDefault();
+}, { passive: false });
+
 import Mundo from './mundo/mundo.js'
 import Renderizador from './render/renderizador.js'
 import GameController from './game/gameController.js'
@@ -20,7 +24,6 @@ const mundo = new Mundo(renderizador) // Passamos a cena do Renderizador
 const gameController = new GameController(mundo, renderizador, sounds, config)
 const menuConfig = new MenuConfig(gameController, jogoPausado)
 const jogador = new Jogador(renderizador, mundo, mundo.terreno, sounds, menuConfig)
-
 
 function animate() {
   requestAnimationFrame(animate)
@@ -49,3 +52,30 @@ function animate() {
 }
 
 animate()
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      ajustarRenderizador();
+    });
+  } else {
+    document.exitFullscreen().then(() => {
+      ajustarRenderizador();
+    });
+  }
+}
+
+// Atualiza o tamanho do renderer ao mudar de tamanho de tela
+function ajustarRenderizador() {
+  renderizador.renderer.setSize(window.innerWidth, window.innerHeight);
+  renderizador.camera.aspect = window.innerWidth / window.innerHeight;
+  renderizador.camera.updateProjectionMatrix();
+}
+
+// Adicionar evento ao botão
+document.getElementById("btnFullscreen").addEventListener("click", toggleFullscreen);
+
+// Adicionar evento para ajustar quando a tela for redimensionada manualmente
+window.addEventListener("resize", ajustarRenderizador);
+
+
