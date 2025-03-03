@@ -25,6 +25,8 @@ const gameController = new GameController(mundo, renderizador, sounds, config)
 const menuConfig = new MenuConfig(gameController, jogoPausado)
 const jogador = new Jogador(renderizador, mundo, mundo.terreno, sounds, menuConfig)
 
+sounds.playMusica()
+
 function animate() {
   requestAnimationFrame(animate)
 

@@ -251,6 +251,7 @@ export default class Jogador {
     this.morto = true
     this.sounds.stopMonstros()
     this.sounds.stopPassaros()
+    this.sounds.stopMusica()
     this.atualizaHud(this.energia, this.vida)
     document.querySelector('div#fimdejogo').textContent = "FIM DE JOGO"
     document.querySelector('.hidden').style.display = 'block'

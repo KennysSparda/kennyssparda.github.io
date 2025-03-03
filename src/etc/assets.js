@@ -28,5 +28,7 @@ const assets = {
 
   // Sons
   passarosSons: '/assets/som/birds-frogs-nature.mp3',
-  monstrosSons: '/assets/som/monstro.mp3'
+  monstrosSons: '/assets/som/monstro.mp3',
+
+  lulaby: '/assets/som/ost_lulaby.mp3',
 }

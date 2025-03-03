@@ -5,6 +5,9 @@ export default class Sound {
 
     this.passarosSons = this.reprodutor(assets.passarosSons, true)
     this.passarosPlaying = false
+
+    this.musicaSons = this.reprodutor(assets.lulaby, true)
+    this.musicaPlaying = false
     
     this.volume = config.volumePrincipal
     this.atualizarVolume(config.volumePrincipal, config.volumeMusica)
@@ -20,8 +23,10 @@ export default class Sound {
 
   atualizarVolume(volumePrincipal, volumeMusica) {
     this.volume = volumePrincipal / 100
+    this.volumeMusica = volumeMusica / 100
     this.monstrosSons.volume = this.volume
     this.passarosSons.volume = this.volume
+    this.musicaSons.volume = this.volumeMusica
   }
 
   playMonstros() {
@@ -38,6 +43,13 @@ export default class Sound {
     this.passarosPlaying = true
   }
 
+  playMusica() {
+    if(!this.musicaPlaying) {
+      this.musicaSons.play()
+    }
+    this.musicaPlaying = true
+  }
+
   stopMonstros() {
     this.monstrosSons.pause()
     this.monstrosPlaying = false
@@ -46,5 +58,10 @@ export default class Sound {
   stopPassaros() {
     this.passarosSons.pause()
     this.passarosPlaying = false
+  }
+
+  stopMusica() {
+    this.musicaSons.pause()
+    this.musicaPlaying = false
   }
 }
